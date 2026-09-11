@@ -435,15 +435,235 @@ export default function App() {
     setTime(0);
     change((p) => fn(p.animation), checkpoint);
   };
+  const [advanced, setAdvanced] = useState(false);
   const changeMode = (mode: Project['mode']) => {
     setPlaying(false);
     change((p) => {
       p.mode = mode;
     });
   };
+  const inputControls =
+    project.workspace === 'browser' ? (
+      <BrowserControls
+        advanced={advanced}
+        project={shown}
+        onChange={(value) =>
+          change((p) => {
+            p.browser = value;
+          })
+        }
+        onReload={() => setBrowserReload((n) => n + 1)}
+      />
+    ) : (
+      <Section
+        title={t('section.screen')}
+        extra={
+          <span className="count-label">
+            {SLOT_IDS.filter((s) => page.slots[s].asset).length}/5
+          </span>
+        }
+      >
+        <div className="segmented fit-switch" aria-label={t('aria.pickScreen')}>
+          <button
+            className={slot === 'outer' || slot === 'standing' ? 'active' : ''}
+            aria-pressed={slot === 'outer' || slot === 'standing'}
+            onClick={() => setSlot('outer')}
+          >
+            {t('slotGroup.outer')}
+          </button>
+          <button
+            className={slot !== 'outer' && slot !== 'standing' ? 'active' : ''}
+            aria-pressed={slot !== 'outer' && slot !== 'standing'}
+            onClick={() => setSlot('landscape')}
+          >
+            {t('slotGroup.inner')}
+          </button>
+        </div>
+        <p className="export-hint">{t('hint.outerAuto')}</p>
+        <select
+          aria-label={t('aria.editSlot')}
+          value={slot}
+          onChange={(e) => setSlot(e.target.value as Slot)}
+        >
+          {SLOT_IDS.map((s) => (
+            <option key={s} value={s}>
+              {SPECS[s].label}
+              {page.slots[s].asset ? ' ✓' : ''}
+            </option>
+          ))}
+        </select>
+        {resolveSlot(page, slot).leftHalf && (
+          <p className="export-hint" role="status">
+            {t('hint.outerDerived', { source: SPECS[resolveSlot(page, slot).source].label })}
+          </p>
+        )}
+        <label
+          className={`upload-zone ${data.asset ? 'has-image' : ''}`}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            void upload(e.dataTransfer.files);
+          }}
+        >
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            aria-label={t('aria.uploadSlot', { slot: SPECS[slot].label })}
+            onChange={(e) => {
+              void upload(e.target.files);
+              e.target.value = '';
+            }}
+          />
+          {data.asset ? (
+            <>
+              <img src={data.asset.data} alt={t('aria.currentUpload')} />
+              <span className="replace-label">
+                <ImagePlus size={14} />
+                {t('action.replaceShot')}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="upload-icon">
+                <ImagePlus size={22} />
+              </span>
+              <strong>{t('upload.title')}</strong>
+              <span>{t('upload.drop')}</span>
+              <small>{t('upload.formats')}</small>
+            </>
+          )}
+        </label>
+        <div className="asset-spec">
+          <span>
+            {SPECS[slot].width} × {SPECS[slot].height} px
+          </span>
+          {data.asset && (
+            <button
+              className="text-button danger"
+              aria-label={t('aria.removeAsset')}
+              onClick={() =>
+                modifySlot((s) => {
+                  s.asset = null;
+                })
+              }
+            >
+              <Trash2 size={12} />
+              {t('action.remove')}
+            </button>
+          )}
+        </div>
+        {data.asset && (
+          <>
+            <p className="asset-filename" title={data.asset.name}>
+              {data.asset.name} · {data.asset.width}×{data.asset.height}
+            </p>
+            <label className="field-label">
+              {t('field.assetSource')}
+              <select
+                aria-label={t('field.assetSource')}
+                value={data.asset.source}
+                onChange={(e) =>
+                  modifySlot((s) => {
+                    if (s.asset)
+                      s.asset.source = e.target.value as 'design' | 'simulator' | 'device';
+                  })
+                }
+              >
+                {(['design', 'simulator', 'device'] as const).map((v) => (
+                  <option key={v} value={v}>
+                    {t(`source.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {(data.asset.width !== SPECS[slot].width ||
+              data.asset.height !== SPECS[slot].height) && (
+              <p className="inline-warning">{t('hint.sizeMismatch')}</p>
+            )}
+          </>
+        )}
+        <div className="segmented fit-switch">
+          {(['contain', 'cover'] as const).map((f) => (
+            <button
+              key={f}
+              className={data.fit === f ? 'active' : ''}
+              onClick={() =>
+                modifySlot((s) => {
+                  s.fit = f;
+                })
+              }
+            >
+              {t(`fit.${f}`)}
+            </button>
+          ))}
+        </div>
+        <p className="export-hint">
+          {data.fit === 'cover' ? t('hint.fitCover') : t('hint.fitContain')}
+        </p>
+        {data.fit === 'cover' && (
+          <>
+            <Range
+              label={t('range.cropX')}
+              value={data.x}
+              min={0}
+              max={1}
+              display={`${Math.round(data.x * 100)}%`}
+              onChange={(n) =>
+                modifySlot((s) => {
+                  s.x = n;
+                }, false)
+              }
+              onCommit={commit}
+            />
+            <Range
+              label={t('range.cropY')}
+              value={data.y}
+              min={0}
+              max={1}
+              display={`${Math.round(data.y * 100)}%`}
+              onChange={(n) =>
+                modifySlot((s) => {
+                  s.y = n;
+                }, false)
+              }
+              onCommit={commit}
+            />
+            <Range
+              label={t('range.zoom')}
+              value={data.zoom}
+              min={1}
+              max={2}
+              display={`${data.zoom.toFixed(2)}×`}
+              onChange={(n) =>
+                modifySlot((s) => {
+                  s.zoom = n;
+                }, false)
+              }
+              onCommit={commit}
+            />
+          </>
+        )}
+        <label className="switch-row">
+          <span>
+            <Sparkles size={13} />
+            {t('switch.demo')}
+          </span>
+          <input
+            type="checkbox"
+            role="switch"
+            checked={project.demo}
+            onChange={(e) =>
+              change((p) => {
+                p.demo = e.target.checked;
+              })
+            }
+          />
+        </label>
+      </Section>
+    );
   return (
     <div
-      className="app-shell"
+      className={`app-shell ${advanced ? 'advanced-ui' : 'simple-ui'}`}
       onClickCapture={(event) => {
         // WebKit does not focus buttons on pointer clicks; retain a reliable dialog return target.
         const button = (event.target as Element).closest('button');
@@ -606,7 +826,10 @@ export default function App() {
           onChange={(e) => void importFile(e.target.files?.[0])}
         />
       </header>
-      <fieldset className="workspace" disabled={!loaded || loadingFile}>
+      <fieldset
+        className={`workspace ${advanced ? 'is-advanced' : 'is-basic'}`}
+        disabled={!loaded || loadingFile}
+      >
         <aside className="sidebar">
           {project.workspace === 'screenshots' && (
             <>
@@ -692,6 +915,20 @@ export default function App() {
         </aside>
         <main className="main-workspace">
           <div className="workspace-toolbar">
+            {!advanced && (
+              <nav className="quick-scenes" aria-label={t('sidebar.scenes')}>
+                {SCENES.map((item) => (
+                  <button
+                    key={item.id}
+                    aria-pressed={project.scene === item.id}
+                    onClick={() => selectScene(item.id)}
+                  >
+                    <SceneIcon scene={item.id} size={22} />
+                    <span>{item.name}</span>
+                  </button>
+                ))}
+              </nav>
+            )}
             <div className="mode-tabs" aria-label={t('aria.mode')}>
               {(
                 [
@@ -716,22 +953,31 @@ export default function App() {
                 </button>
               ))}
             </div>
-            <span className="local-badge">
-              <span />
-              {t('badge.local')}
-            </span>
-          </div>
-          {project.workspace === 'browser' && (
             <button
-              className="mobile-browser-address text-button"
-              onClick={() => {
-                document.getElementById('browser-address')?.focus();
-                document.getElementById('browser-address')?.scrollIntoView({ block: 'center' });
-              }}
+              className={`advanced-toggle button quiet ${advanced ? 'active' : ''}`}
+              aria-expanded={advanced}
+              aria-controls="scene-settings"
+              onClick={() => setAdvanced((value) => !value)}
             >
-              {t('action.changeUrl')}
+              <SlidersHorizontal size={15} />
+              {t('inspector.advanced')}
+              <ChevronDown size={14} />
             </button>
-          )}
+          </div>
+          <div className="primary-inputs">
+            {project.workspace === 'browser' ? (
+              inputControls
+            ) : (
+              <details className="screenshot-inputs">
+                <summary>
+                  <ImagePlus size={16} />
+                  {t('upload.title')}
+                  <ChevronDown size={14} />
+                </summary>
+                {inputControls}
+              </details>
+            )}
+          </div>
           <div className="canvas-area" id="duo-preview">
             <div className="canvas-heading">
               <div>
@@ -896,229 +1142,12 @@ export default function App() {
             </div>
           </div>
         </main>
-        <aside className="inspector">
+        <aside className="inspector" id="scene-settings" hidden={!advanced}>
           <div className="inspector-heading">
             <SlidersHorizontal size={16} />
             <strong>{t('inspector.title')}</strong>
             <span>EDIT</span>
           </div>
-          {project.workspace === 'browser' ? (
-            <BrowserControls
-              project={shown}
-              onChange={(value) =>
-                change((p) => {
-                  p.browser = value;
-                })
-              }
-              onReload={() => setBrowserReload((n) => n + 1)}
-            />
-          ) : (
-            <Section
-              title={t('section.screen')}
-              extra={
-                <span className="count-label">
-                  {SLOT_IDS.filter((s) => page.slots[s].asset).length}/5
-                </span>
-              }
-            >
-              <div className="segmented fit-switch" aria-label={t('aria.pickScreen')}>
-                <button
-                  className={slot === 'outer' || slot === 'standing' ? 'active' : ''}
-                  aria-pressed={slot === 'outer' || slot === 'standing'}
-                  onClick={() => setSlot('outer')}
-                >
-                  {t('slotGroup.outer')}
-                </button>
-                <button
-                  className={slot !== 'outer' && slot !== 'standing' ? 'active' : ''}
-                  aria-pressed={slot !== 'outer' && slot !== 'standing'}
-                  onClick={() => setSlot('landscape')}
-                >
-                  {t('slotGroup.inner')}
-                </button>
-              </div>
-              <p className="export-hint">{t('hint.outerAuto')}</p>
-              <select
-                aria-label={t('aria.editSlot')}
-                value={slot}
-                onChange={(e) => setSlot(e.target.value as Slot)}
-              >
-                {SLOT_IDS.map((s) => (
-                  <option key={s} value={s}>
-                    {SPECS[s].label}
-                    {page.slots[s].asset ? ' ✓' : ''}
-                  </option>
-                ))}
-              </select>
-              {resolveSlot(page, slot).leftHalf && (
-                <p className="export-hint" role="status">
-                  {t('hint.outerDerived', { source: SPECS[resolveSlot(page, slot).source].label })}
-                </p>
-              )}
-              <label
-                className={`upload-zone ${data.asset ? 'has-image' : ''}`}
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  void upload(e.dataTransfer.files);
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  aria-label={t('aria.uploadSlot', { slot: SPECS[slot].label })}
-                  onChange={(e) => {
-                    void upload(e.target.files);
-                    e.target.value = '';
-                  }}
-                />
-                {data.asset ? (
-                  <>
-                    <img src={data.asset.data} alt={t('aria.currentUpload')} />
-                    <span className="replace-label">
-                      <ImagePlus size={14} />
-                      {t('action.replaceShot')}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="upload-icon">
-                      <ImagePlus size={22} />
-                    </span>
-                    <strong>{t('upload.title')}</strong>
-                    <span>{t('upload.drop')}</span>
-                    <small>{t('upload.formats')}</small>
-                  </>
-                )}
-              </label>
-              <div className="asset-spec">
-                <span>
-                  {SPECS[slot].width} × {SPECS[slot].height} px
-                </span>
-                {data.asset && (
-                  <button
-                    className="text-button danger"
-                    aria-label={t('aria.removeAsset')}
-                    onClick={() =>
-                      modifySlot((s) => {
-                        s.asset = null;
-                      })
-                    }
-                  >
-                    <Trash2 size={12} />
-                    {t('action.remove')}
-                  </button>
-                )}
-              </div>
-              {data.asset && (
-                <>
-                  <p className="asset-filename" title={data.asset.name}>
-                    {data.asset.name} · {data.asset.width}×{data.asset.height}
-                  </p>
-                  <label className="field-label">
-                    {t('field.assetSource')}
-                    <select
-                      aria-label={t('field.assetSource')}
-                      value={data.asset.source}
-                      onChange={(e) =>
-                        modifySlot((s) => {
-                          if (s.asset)
-                            s.asset.source = e.target.value as 'design' | 'simulator' | 'device';
-                        })
-                      }
-                    >
-                      {(['design', 'simulator', 'device'] as const).map((v) => (
-                        <option key={v} value={v}>
-                          {t(`source.${v}`)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  {(data.asset.width !== SPECS[slot].width ||
-                    data.asset.height !== SPECS[slot].height) && (
-                    <p className="inline-warning">{t('hint.sizeMismatch')}</p>
-                  )}
-                </>
-              )}
-              <div className="segmented fit-switch">
-                {(['contain', 'cover'] as const).map((f) => (
-                  <button
-                    key={f}
-                    className={data.fit === f ? 'active' : ''}
-                    onClick={() =>
-                      modifySlot((s) => {
-                        s.fit = f;
-                      })
-                    }
-                  >
-                    {t(`fit.${f}`)}
-                  </button>
-                ))}
-              </div>
-              <p className="export-hint">
-                {data.fit === 'cover' ? t('hint.fitCover') : t('hint.fitContain')}
-              </p>
-              {data.fit === 'cover' && (
-                <>
-                  <Range
-                    label={t('range.cropX')}
-                    value={data.x}
-                    min={0}
-                    max={1}
-                    display={`${Math.round(data.x * 100)}%`}
-                    onChange={(n) =>
-                      modifySlot((s) => {
-                        s.x = n;
-                      }, false)
-                    }
-                    onCommit={commit}
-                  />
-                  <Range
-                    label={t('range.cropY')}
-                    value={data.y}
-                    min={0}
-                    max={1}
-                    display={`${Math.round(data.y * 100)}%`}
-                    onChange={(n) =>
-                      modifySlot((s) => {
-                        s.y = n;
-                      }, false)
-                    }
-                    onCommit={commit}
-                  />
-                  <Range
-                    label={t('range.zoom')}
-                    value={data.zoom}
-                    min={1}
-                    max={2}
-                    display={`${data.zoom.toFixed(2)}×`}
-                    onChange={(n) =>
-                      modifySlot((s) => {
-                        s.zoom = n;
-                      }, false)
-                    }
-                    onCommit={commit}
-                  />
-                </>
-              )}
-              <label className="switch-row">
-                <span>
-                  <Sparkles size={13} />
-                  {t('switch.demo')}
-                </span>
-                <input
-                  type="checkbox"
-                  role="switch"
-                  checked={project.demo}
-                  onChange={(e) =>
-                    change((p) => {
-                      p.demo = e.target.checked;
-                    })
-                  }
-                />
-              </label>
-            </Section>
-          )}
           <Section title={t('section.appearance')}>
             <label className="field-label">{t('field.background')}</label>
             <div className="swatches">
@@ -1464,16 +1493,6 @@ export default function App() {
           )}
         </aside>
       </fieldset>
-      <footer className="statusbar">
-        <span>
-          <ShieldCheck size={12} />
-          {t('footer.local')}
-        </span>
-        <span>{t('footer.disclaimer')}</span>
-        <button onClick={() => setModal('help')}>
-          Duo Studio <span>v1.0</span>
-        </button>
-      </footer>
       {notice && (
         <div
           className={`toast ${notice.error ? 'error' : ''}`}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Maximize, Minimize } from 'lucide-react';
 import { flushSync } from 'react-dom';
 import type { Project } from '../lib/project';
 import { currentPage, dimensions } from '../lib/project';
@@ -24,6 +25,51 @@ export function Stage({
   const [error, setError] = useState('');
   const [surfaces, setSurfaces] = useState<BrowserSurface[]>([]);
   const [frameEvent, setFrameEvent] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [fallbackFullscreen, setFallbackFullscreen] = useState(false);
+  const fullscreenButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const sync = () => {
+      setFullscreen(document.fullscreenElement === wrapper.current);
+      if (!document.fullscreenElement) fullscreenButton.current?.focus();
+    };
+    document.addEventListener('fullscreenchange', sync);
+    return () => document.removeEventListener('fullscreenchange', sync);
+  }, []);
+  useEffect(() => {
+    if (!fallbackFullscreen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setFallbackFullscreen(false);
+        setFullscreen(false);
+        fullscreenButton.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener('keydown', escape);
+    };
+  }, [fallbackFullscreen]);
+  const toggleFullscreen = async () => {
+    if (fallbackFullscreen) {
+      setFallbackFullscreen(false);
+      setFullscreen(false);
+    } else if (document.fullscreenElement === wrapper.current) {
+      await document.exitFullscreen();
+    } else {
+      try {
+        if (!wrapper.current?.requestFullscreen) throw new Error('Fullscreen unavailable');
+        await wrapper.current.requestFullscreen();
+      } catch {
+        setFallbackFullscreen(true);
+        setFullscreen(true);
+      }
+    }
+  };
+
   useEffect(() => setFrameEvent(false), [project.browser.url, browserReload]);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -44,11 +90,16 @@ export function Stage({
     const observer = new ResizeObserver(([e]) => {
       const d = dimensions(project),
         width = Math.max(1, Math.round(e.contentRect.width * Math.min(devicePixelRatio, 2)));
-      setSize({ width, height: Math.round((width * d.height) / d.width) });
+      setSize({
+        width,
+        height: fullscreen
+          ? Math.max(1, Math.round(e.contentRect.height * Math.min(devicePixelRatio, 2)))
+          : Math.round((width * d.height) / d.width),
+      });
     });
     observer.observe(wrapper.current!);
     return () => observer.disconnect();
-  }, [project.mode, project.output.size, project.output.storeSize]);
+  }, [project.mode, project.output.size, project.output.storeSize, fullscreen]);
   useEffect(() => {
     let active = true;
     if (renderer.current && target.current) {
@@ -85,9 +136,20 @@ export function Stage({
   return (
     <div
       ref={wrapper}
-      className={`stage-canvas ${project.view.transparent && project.mode === 'image' ? 'checker' : ''}`}
+      className={`stage-canvas ${fallbackFullscreen ? 'fullscreen-fallback' : ''} ${project.view.transparent && project.mode === 'image' ? 'checker' : ''}`}
       style={{ aspectRatio: `${d.width}/${d.height}` }}
     >
+      <button
+        ref={fullscreenButton}
+        type="button"
+        className="canvas-fullscreen-toggle"
+        aria-label={t(fullscreen ? 'canvas.exitFullscreen' : 'canvas.fullscreen')}
+        title={t(fullscreen ? 'canvas.exitFullscreen' : 'canvas.fullscreen')}
+        aria-pressed={fullscreen}
+        onClick={() => void toggleFullscreen()}
+      >
+        {fullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+      </button>
       <canvas
         ref={target}
         aria-label={t('aria.stage')}
