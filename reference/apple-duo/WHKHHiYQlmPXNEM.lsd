@@ -1,0 +1,104 @@
+[
+  {
+    "id": "FvhDncFakkFgzZY",
+    "path": "/uploads/dIFKSKvliUSYOBw/dOKLAkGZzJBEnNO/gVFBvbhWgzeMQqC/megyEIopJyvbcOt/kifhkaVQkSALvmb/ZCLTYwVwnedBbMG.ktx",
+    "properties": {
+      "anisotropy": 1.0,
+      "channel": 0,
+      "colorSpace": "srgb",
+      "flipY": false,
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "type": 1009,
+      "wrapS": 1001,
+      "wrapT": 1001
+    },
+    "type": "texture"
+  },
+  {
+    "id": "iReunoNLxYiCniq",
+    "path": "/uploads/dIFKSKvliUSYOBw/dOKLAkGZzJBEnNO/gVFBvbhWgzeMQqC/megyEIopJyvbcOt/kifhkaVQkSALvmb/mARRttLqqfJHFpf.ktx",
+    "properties": {
+      "anisotropy": 1.0,
+      "channel": 0,
+      "colorSpace": "srgb",
+      "flipY": false,
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "type": 1009,
+      "wrapS": 1001,
+      "wrapT": 1001
+    },
+    "type": "texture"
+  },
+  {
+    "id": "kFRVLdFsGEQvgfU",
+    "path": "/uploads/dIFKSKvliUSYOBw/dOKLAkGZzJBEnNO/gVFBvbhWgzeMQqC/megyEIopJyvbcOt/kifhkaVQkSALvmb/KJVtXHlYENhFUul.ktx",
+    "properties": {
+      "anisotropy": 1.0,
+      "channel": 0,
+      "colorSpace": "srgb",
+      "flipY": false,
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "type": 1009,
+      "wrapS": 1001,
+      "wrapT": 1001
+    },
+    "type": "texture"
+  },
+  {
+    "id": "jmLpHTXbOwwbvdL",
+    "path": "/uploads/dIFKSKvliUSYOBw/dOKLAkGZzJBEnNO/gVFBvbhWgzeMQqC/megyEIopJyvbcOt/kifhkaVQkSALvmb/NwxOqEZUyhSjCYN.ktx",
+    "properties": {
+      "anisotropy": 1.0,
+      "channel": 0,
+      "colorSpace": "srgb",
+      "flipY": false,
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "type": 1009,
+      "wrapS": 1001,
+      "wrapT": 1001
+    },
+    "type": "texture"
+  },
+  {
+    "id": "sFbltaozBocjYMi",
+    "path": "/uploads/dIFKSKvliUSYOBw/dOKLAkGZzJBEnNO/gVFBvbhWgzeMQqC/megyEIopJyvbcOt/kifhkaVQkSALvmb/hnXToRySsvemhWO.ktx",
+    "properties": {
+      "anisotropy": 1.0,
+      "channel": 0,
+      "colorSpace": "srgb",
+      "flipY": false,
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "type": 1009,
+      "wrapS": 1001,
+      "wrapT": 1001
+    },
+    "type": "texture"
+  },
+  {
+    "id": "QUYjXzcTSzNOKmz",
+    "path": "/uploads/dIFKSKvliUSYOBw/dOKLAkGZzJBEnNO/gVFBvbhWgzeMQqC/megyEIopJyvbcOt/kifhkaVQkSALvmb/sfpLTMUCoToMbsj.ktx",
+    "properties": {
+      "anisotropy": 1.0,
+      "channel": 0,
+      "colorSpace": "srgb",
+      "flipY": false,
+      "magFilter": 1006,
+      "mapping": 300,
+      "minFilter": 1008,
+      "type": 1009,
+      "wrapS": 1001,
+      "wrapT": 1001
+    },
+    "type": "texture"
+  }
+]
