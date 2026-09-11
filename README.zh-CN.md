@@ -6,6 +6,12 @@
 
 完全运行于浏览器的折叠屏 App 素材工作台。中文界面，Apple 官网骨骼 3D 设备模型，用户图片不上传。Cloudflare Pages 只托管静态文件。
 
+![Duo Studio 工作台](docs/screenshots/readme/workbench.png)
+
+| 自由开合 | 实时网页模拟 | 深色模式与自定义背景 |
+| :---: | :---: | :---: |
+| ![半展开形态](docs/screenshots/readme/fold.png) | ![网页模拟](docs/screenshots/readme/browser-sim.png) | ![深色模式与自定义背景图](docs/screenshots/readme/dark-mode.png) |
+
 ## 本地运行
 
 Node 22+。

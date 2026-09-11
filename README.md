@@ -6,6 +6,12 @@
 
 A foldable-phone screenshot studio that runs entirely in your browser. Place your app screenshots on the Apple-website 3D device model, pose it, and export PNGs, MP4/WebM/GIF open-close animations, or a full App Store scene bundle. Images are never uploaded — everything is processed locally, and a static host (e.g. Cloudflare Pages) only serves files.
 
+![Duo Studio workbench](docs/screenshots/readme/workbench.png)
+
+| Free folding | Live browser simulation | Dark mode & custom backgrounds |
+| :---: | :---: | :---: |
+| ![Half-folded pose](docs/screenshots/readme/fold.png) | ![Browser simulation](docs/screenshots/readme/browser-sim.png) | ![Dark mode with a custom background image](docs/screenshots/readme/dark-mode.png) |
+
 ## Features
 
 - **Six device poses** — closed, landscape, portrait, seated, standing, and free fold with a live slider.
