@@ -68,7 +68,7 @@ More details in [docs/PRD.md](docs/PRD.md), [docs/IMPLEMENTATION_PLAN.md](docs/I
 - [DuoLikeAnimation](https://github.com/elijah-semyonov/DuoLikeAnimation) — inspiration for the open/close animation approach.
 - Codex Astra — this project was built with the help of the Codex Astra coding agent.
 
-EchoPod demo screens are provided by [EchoPod](https://echopod.clothpath.com/) users and are only used to demonstrate the tool.
+Default placeholder screens are Apple's official iPhone Duo lock screen imagery ([apple.com/sg/iphone-duo](https://www.apple.com/sg/iphone-duo)), used only to demonstrate the tool.
 
 ## License
 

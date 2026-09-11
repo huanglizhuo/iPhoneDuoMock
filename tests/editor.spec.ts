@@ -129,7 +129,7 @@ test('project round trip, persistence, undo and invalid import isolation', async
   await page.getByRole('button', { name: 'Add page', exact: true }).click();
   await expect(page.getByLabel('Page name')).toHaveValue('Page 2');
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
-  await expect(page.getByLabel('Page name')).toHaveValue('EchoPod · Language learning');
+  await expect(page.getByLabel('Page name')).toHaveValue('iPhone Duo · Demo');
   await page.getByLabel('Import project file').setInputFiles({
     name: 'bad.json',
     mimeType: 'application/json',
@@ -179,14 +179,14 @@ test('batch ZIP only contains uploaded scenes and raw PNG matches official resol
   expect(pngSize(raw)).toEqual([1398, 2034]);
 });
 
-test('EchoPod demo replaces store mode and exports display sizes', async ({ page }) => {
+test('built-in demo replaces store mode and exports display sizes', async ({ page }) => {
   await ready(page);
   await expect(page.getByRole('button', { name: 'Store bundle', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('link', { name: 'Learn about EchoPod ↗' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'See iPhone Duo on apple.com ↗' })).toHaveAttribute(
     'href',
-    'https://echopod.clothpath.com/',
+    'https://www.apple.com/sg/iphone-duo/',
   );
-  await expect(page.getByLabel('Page name')).toHaveValue('EchoPod · Language learning');
+  await expect(page.getByLabel('Page name')).toHaveValue('iPhone Duo · Demo');
   for (const [size, expected] of Object.entries({
     wide: [1600, 1000],
     tall: [1080, 1350],

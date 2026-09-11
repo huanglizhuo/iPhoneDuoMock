@@ -5,7 +5,7 @@ test('live browser keeps iframe state through folding and workspace switches pre
   await page.goto('/');
   await expect(page.getByText('Saved to this browser')).toBeVisible();
   await page.getByRole('button', { name: 'Inner screen', exact: true }).click();
-  await page.getByLabel('Upload Inner · Landscape').setInputFiles('public/demo/echopod/inner.png');
+  await page.getByLabel('Upload Inner · Landscape').setInputFiles('public/demo/apple/inner.png');
   await page.getByRole('button', { name: 'Browser sim', exact: false }).click();
   await page
     .getByRole('button', { name: /Landscape/ })

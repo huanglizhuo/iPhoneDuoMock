@@ -340,7 +340,7 @@ export const projectSchema = z
   })
   .transform((p) => {
     for (const page of p.pages) {
-      // Legacy projects shipped a travel demo; migrate them to the EchoPod sample in place.
+      // Legacy projects shipped a travel demo; migrate them to the bundled demo naming in place.
       if (
         page.name === '山野 · 旅行计划' &&
         page.title === '把下一程，展开。' &&

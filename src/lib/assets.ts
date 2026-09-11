@@ -112,9 +112,9 @@ export async function screenCanvas(
   return c;
 }
 const demoImages = new Map<string, Promise<HTMLImageElement>>();
-/** Bundled EchoPod examples are never counted as user uploads. */
+/** Bundled Apple lock screen examples are never counted as user uploads. */
 export async function drawDemo(ctx: CanvasRenderingContext2D, w: number, h: number, slot: Slot) {
-  const url = `/demo/echopod/${slot === 'landscape' ? 'inner' : slot === 'portrait' || slot === 'seated' ? 'inner-portrait' : slot === 'standing' ? 'outer-landscape' : 'outer'}.png`;
+  const url = `/demo/apple/${slot === 'landscape' ? 'inner' : slot === 'portrait' || slot === 'seated' ? 'inner-portrait' : slot === 'standing' ? 'outer-landscape' : 'outer'}.png`;
   let pending = demoImages.get(url);
   if (!pending) {
     pending = decodeImage(url).catch((error) => {

@@ -1408,7 +1408,7 @@ export default function App() {
               <p className="helper-text">{t('demo.note')}</p>
               <a
                 className="text-button"
-                href="https://echopod.clothpath.com/"
+                href="https://www.apple.com/sg/iphone-duo/"
                 target="_blank"
                 rel="noreferrer"
               >

@@ -52,7 +52,7 @@ export const en = {
   'badge.local': 'Local workspace',
   'canvas.webPreview': 'Web preview',
   'tag.liveWeb': 'Live web',
-  'tag.demo': 'EchoPod demo',
+  'tag.demo': 'Apple demo',
   'tag.missing': 'Shots missing',
   'tag.yours': 'Your shots',
   'hint.browserInteractive': 'Click the page to interact · slider folds the device',
@@ -86,7 +86,7 @@ export const en = {
   'section.animation': 'Animation',
   'section.previewCanvas': 'Preview canvas',
   'section.output': 'Output size',
-  'section.demo': 'EchoPod demo',
+  'section.demo': 'Demo content',
   'section.page': 'Current page',
   'slotGroup.outer': 'Outer screen',
   'slotGroup.inner': 'Inner screen',
@@ -145,10 +145,10 @@ export const en = {
   'hint.outputAnimation': 'Video max edge 1280 px · GIF max edge 640 px',
   'hint.outputImage': 'PNG exports at the selected size, keeping the UI ratio.',
   'demo.description':
-    'Learn languages with podcasts, YouTube, and your own media: word-by-word captions, instant lookup, translation, and AI grammar help.',
+    'Placeholder screens use the official iPhone Duo lock screen imagery from apple.com, so you can explore poses and exports before uploading anything.',
   'demo.note':
-    'These images only demonstrate the simulator. Upload your own screens to generate your own mockups and animations.',
-  'demo.link': 'Learn about EchoPod ↗',
+    'Demo images are for showcasing only — upload your own screens to generate real mockups and animations.',
+  'demo.link': 'See iPhone Duo on apple.com ↗',
   'footer.local': '100% processed in your browser',
   'footer.disclaimer': 'Apple-website device mesh · pose previews are not real app validation',
   'modal.deleteTitle': 'Delete this page?',
@@ -167,7 +167,7 @@ export const en = {
   'help.privacyNote':
     'Assets never leave your device. Autosave stays in this browser; download a project backup before clearing browser data.',
   'help.assetsNote':
-    'The device uses the mesh and fold animation published on the Apple website; materials and screen effects are rendered locally. Demo screens come from EchoPod, provided by its users. Until you upload assets, screens are clearly marked "EchoPod demo" — nothing is auto-adapted.',
+    'The device uses the mesh and fold animation published on the Apple website; materials and screen effects are rendered locally. Placeholder screens are Apple’s official iPhone Duo lock screen imagery. Until you upload assets, screens are clearly marked "Apple demo" — nothing is auto-adapted.',
   'help.storeNote':
     'App Store App Previews must be based on real app screen recordings; this tool’s device animation is for promotion. Screenshot specs referenced on 2026-09-10.',
   'help.appleSpecs': 'View Apple screenshot specs ↗',
@@ -316,10 +316,9 @@ export const en = {
   'output.square': 'Square · 1200 × 1200',
   'project.defaultName': 'My Duo project',
   'project.unnamed': 'Untitled project',
-  'project.demoPageName': 'EchoPod · Language learning',
-  'project.demoTitle': 'EchoPod — turn listening into learning.',
-  'project.demoSubtitle':
-    'Word-by-word captions, instant lookup, translation, and AI grammar help.',
+  'project.demoPageName': 'iPhone Duo · Demo',
+  'project.demoTitle': 'iPhone Duo.',
+  'project.demoSubtitle': 'Demo content from the Apple website.',
   'page.newPage': 'New page',
   'page.unnamed': 'Untitled page',
   'page.defaultName': 'Page {n}',

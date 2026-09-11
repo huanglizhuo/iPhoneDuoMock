@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-test('EchoPod source images match all five device slots', async ({ page }) => {
+test('Apple source images match all five device slots', async ({ page }) => {
   for (const [name, w, h] of [
     ['inner', 2853, 2007],
     ['inner-portrait', 2007, 2853],
     ['outer-landscape', 2034, 1398],
     ['outer', 1398, 2034],
   ] as const) {
-    const file = await readFile(`public/demo/echopod/${name}.png`);
+    const file = await readFile(`public/demo/apple/${name}.png`);
     expect([file.readUInt32BE(16), file.readUInt32BE(20)]).toEqual([w, h]);
   }
   await page.goto('/');
@@ -29,7 +29,7 @@ test('EchoPod source images match all five device slots', async ({ page }) => {
       actual.width = expected.width = 320;
       actual.height = expected.height = Math.round((320 * SPECS[slot].height) / SPECS[slot].width);
       await drawDemo(actual.getContext('2d'), actual.width, actual.height, slot);
-      const image = await decodeImage(`/demo/echopod/${file}.png`),
+      const image = await decodeImage(`/demo/apple/${file}.png`),
         ctx = expected.getContext('2d')!;
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, expected.width, expected.height);
