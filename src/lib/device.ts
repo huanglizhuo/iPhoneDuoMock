@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import type { Page, Project } from './project';
-import { screenCanvas, canvas, context } from './assets';
+import { screenCanvas, canvas, context, decodeImage } from './assets';
 import { sceneSlot, resolveSlot, screenSlots } from './project';
 import { screenSurface } from './browser';
 import { ScreenVisibility } from './screen-visibility';
@@ -39,9 +39,12 @@ export class DeviceRenderer {
   private finishes: { material: THREE.MeshStandardMaterial; color: THREE.Color }[] = [];
   private ready?: Promise<void>;
   private assetKey = '';
+  private backgroundKey = '';
   private serial = 0;
   private disposed = false;
   private visibility?: ScreenVisibility;
+  /** Decoded custom background, prepared asynchronously for synchronous use in compose(). */
+  backgroundImage: HTMLImageElement | null = null;
   constructor(private textureLimit = 2048) {
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -132,6 +135,13 @@ export class DeviceRenderer {
     if (this.disposed) return;
     await (this.ready ??= this.loadModel());
     if (this.disposed) return;
+    const background = project.view.backgroundImage?.data ?? '';
+    if (background !== this.backgroundKey) {
+      const image = background ? await decodeImage(background) : null;
+      if (this.disposed) return;
+      this.backgroundKey = background;
+      this.backgroundImage = image;
+    }
     const { inner: innerSlot, outer: outerSlot } = screenSlots(project.scene);
     const outerContent = resolveSlot(page, outerSlot);
     const key = JSON.stringify([

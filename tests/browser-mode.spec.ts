@@ -13,10 +13,11 @@ test('live browser keeps iframe state through folding and workspace switches pre
     .click();
   const frame = page.frameLocator('iframe[title="Duo inner screen page"]');
   await expect(frame.getByText('Live CSS viewport: 951 × 669 px')).toBeVisible();
-  await frame.getByRole('button', { name: 'Clicks: 0' }).click();
-  await expect(frame.getByRole('button', { name: 'Clicks: 1' })).toBeVisible();
+  await frame.getByLabel('Demo URL').fill('not a valid url');
+  await frame.getByRole('button', { name: 'Open', exact: true }).click();
+  await expect(frame.getByText('Enter an http:// or https:// address')).toBeVisible();
   await page.getByRole('slider', { name: 'Fold progress', exact: true }).fill('0.8');
-  await expect(frame.getByRole('button', { name: 'Clicks: 1' })).toBeVisible();
+  await expect(frame.getByText('Enter an http:// or https:// address')).toBeVisible();
   await expect(page.getByTestId('web-overlay')).toHaveAttribute('data-scene', 'landscape');
   await page.getByRole('button', { name: /^Closed/ }).click();
   await expect(

@@ -2,6 +2,8 @@
 
 **[English](README.md)** · **[简体中文](README.zh-CN.md)**
 
+**在线体验：<https://iduo.clothpath.com/>**
+
 完全运行于浏览器的折叠屏 App 素材工作台。中文界面，Apple 官网骨骼 3D 设备模型，用户图片不上传。Cloudflare Pages 只托管静态文件。
 
 ## 本地运行

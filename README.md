@@ -2,6 +2,8 @@
 
 **[English](README.md)** · [简体中文](README.zh-CN.md)
 
+**Live demo: <https://iduo.clothpath.com/>**
+
 A foldable-phone screenshot studio that runs entirely in your browser. Place your app screenshots on the Apple-website 3D device model, pose it, and export PNGs, MP4/WebM/GIF open-close animations, or a full App Store scene bundle. Images are never uploaded — everything is processed locally, and a static host (e.g. Cloudflare Pages) only serves files.
 
 ## Features

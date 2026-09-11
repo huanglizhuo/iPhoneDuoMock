@@ -380,6 +380,26 @@ export default function App() {
       setLoadingFile(false);
     }
   };
+  const uploadBackground = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setLoadingFile(true);
+    try {
+      const asset = await readAsset(files[0]);
+      change((p) => {
+        p.view.background = 'custom';
+        p.view.backgroundImage = {
+          name: asset.name,
+          data: asset.data,
+          width: asset.width,
+          height: asset.height,
+        };
+      });
+    } catch (e) {
+      notify((e as Error).message, true);
+    } finally {
+      setLoadingFile(false);
+    }
+  };
   const importFile = async (file?: File) => {
     if (!file) return;
     setLoadingFile(true);
@@ -1119,8 +1139,68 @@ export default function App() {
                   {project.view.background === b.id && <Check size={15} style={{ color: b.ink }} />}
                 </button>
               ))}
-              <span>{BACKGROUNDS.find((b) => b.id === project.view.background)!.name}</span>
+              <label
+                className={`swatch custom-color-swatch ${
+                  project.view.background === 'custom' && !project.view.backgroundImage
+                    ? 'active'
+                    : ''
+                }`}
+                title={t('aria.bgColor')}
+                aria-label={t('aria.bgColor')}
+                aria-pressed={project.view.background === 'custom' && !project.view.backgroundImage}
+              >
+                <input
+                  type="color"
+                  aria-label={t('aria.bgColor')}
+                  value={project.view.backgroundColor}
+                  onChange={(e) =>
+                    change((p) => {
+                      p.view.background = 'custom';
+                      p.view.backgroundColor = e.target.value;
+                    })
+                  }
+                />
+              </label>
+              <span>
+                {project.view.background === 'custom'
+                  ? t('bg.custom')
+                  : BACKGROUNDS.find((b) => b.id === project.view.background)!.name}
+              </span>
             </div>
+            <div className="bg-custom-row">
+              <label className="button quiet bg-image-button">
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  aria-label={t('aria.bgImage')}
+                  onChange={(e) => {
+                    void uploadBackground(e.target.files);
+                    e.target.value = '';
+                  }}
+                />
+                <ImagePlus size={14} />
+                {t('action.uploadBgImage')}
+              </label>
+              {project.view.backgroundImage && (
+                <button
+                  className="text-button danger"
+                  aria-label={t('action.removeBgImage')}
+                  onClick={() =>
+                    change((p) => {
+                      p.view.backgroundImage = null;
+                    })
+                  }
+                >
+                  <Trash2 size={12} />
+                  {t('action.removeBgImage')}
+                </button>
+              )}
+            </div>
+            <p className="export-hint">
+              {project.view.backgroundImage
+                ? t('hint.bgImage', { w: output.width, h: output.height })
+                : t('hint.bgCustom')}
+            </p>
             {project.mode === 'image' && (
               <label className="switch-row">
                 <span>

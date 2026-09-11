@@ -73,8 +73,9 @@ try {
   await page.context().setOffline(false);
   await page.getByRole('button', { name: /Browser sim/ }).click();
   const demo = page.frameLocator('iframe[title="Duo inner screen page"]');
-  await demo.getByRole('button', { name: 'Clicks: 0' }).click();
-  assert.equal(await demo.getByRole('button', { name: 'Clicks: 1' }).count(), 1);
+  await demo.getByLabel('Demo URL').fill('!!not a url!!');
+  await demo.getByRole('button', { name: 'Open', exact: true }).click();
+  assert.equal(await demo.getByText('Enter an http:// or https:// address').count(), 1);
   await page.getByRole('button', { name: /Screenshots/ }).click();
   await page.getByRole('button', { name: 'Export', exact: true }).click();
   const event = page.waitForEvent('download');

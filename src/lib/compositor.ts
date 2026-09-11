@@ -14,12 +14,21 @@ export function compose(
     target.height = height;
   }
   const ctx = context(target),
-    bg = BACKGROUNDS.find((b) => b.id === p.view.background)!;
+    preset = BACKGROUNDS.find((b) => b.id === p.view.background),
+    custom = p.view.background === 'custom';
   ctx.clearRect(0, 0, width, height);
   const transparent = p.mode !== 'animation' && p.view.transparent;
   if (!transparent) {
-    ctx.fillStyle = bg.color;
+    ctx.fillStyle = custom ? p.view.backgroundColor : preset!.color;
     ctx.fillRect(0, 0, width, height);
+    const image = custom ? renderer.backgroundImage : null;
+    if (image) {
+      // The custom image always fills the canvas; a ratio mismatch is cropped on both axes.
+      const scale = Math.max(width / image.width, height / image.height),
+        w = image.width * scale,
+        h = image.height * scale;
+      ctx.drawImage(image, (width - w) / 2, (height - h) / 2, w, h);
+    }
   }
   const x = 0,
     y = 0,

@@ -982,6 +982,41 @@ h1 {
   color: var(--muted);
   margin-left: 3px;
 }
+.custom-color-swatch {
+  background: conic-gradient(#f2b266, #e26d5c, #269d8f, #2a4e6e, #6284f5, #b265e0, #f2b266);
+  cursor: pointer;
+}
+.custom-color-swatch input[type='color'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.bg-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 8px;
+}
+.bg-image-button {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  height: 29px;
+  font-size: 11px;
+}
+.bg-image-button input[type='file'] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
 .metal-dot {
   height: 11px;
   width: 11px;

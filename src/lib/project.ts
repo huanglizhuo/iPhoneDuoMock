@@ -152,7 +152,7 @@ export const SCENES: {
   },
 ];
 export const BACKGROUNDS: {
-  id: 'paper' | 'mist' | 'blue' | 'sand' | 'night';
+  id: 'paper' | 'mist' | 'blue' | 'sand' | 'night' | 'black';
   name: string;
   color: string;
   ink: string;
@@ -195,6 +195,14 @@ export const BACKGROUNDS: {
       return t('bg.night');
     },
     color: '#202733',
+    ink: '#f4f6fa',
+  },
+  {
+    id: 'black',
+    get name() {
+      return t('bg.black');
+    },
+    color: '#000000',
     ink: '#f4f6fa',
   },
 ];
@@ -241,6 +249,17 @@ export const slotSchema = z.object({
 });
 export type Asset = z.infer<typeof assetSchema>;
 export type SlotData = z.infer<typeof slotSchema>;
+// Custom canvas background image; same encoding rules as slot assets, minus the source tag.
+const backgroundImageSchema = z.object({
+  name: z.string().max(200),
+  data: z
+    .string()
+    .max(28_000_000)
+    .regex(/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/),
+  width: z.number().int().min(1).max(4096),
+  height: z.number().int().min(1).max(4096),
+});
+export type BackgroundImage = z.infer<typeof backgroundImageSchema>;
 const pageSchema = z.object({
   id: z.string().min(1).max(80),
   name: z.string().min(1).max(40),
@@ -290,7 +309,12 @@ export const projectSchema = z
       pitch: bounded(-0.6, 0.6),
       scale: bounded(0.65, 1.25),
       body: z.enum(['silver', 'dark']),
-      background: z.enum(['paper', 'mist', 'blue', 'sand', 'night']),
+      background: z.enum(['paper', 'mist', 'blue', 'sand', 'night', 'black', 'custom']),
+      backgroundColor: z
+        .string()
+        .regex(/^#[0-9a-fA-F]{6}$/)
+        .default('#232a36'),
+      backgroundImage: backgroundImageSchema.nullable().default(null),
       transparent: z.boolean(),
     }),
     animation: z.object({
@@ -364,6 +388,8 @@ export function initialProject(): Project {
       scale: 1,
       body: 'silver',
       background: 'paper',
+      backgroundColor: '#232a36',
+      backgroundImage: null,
       transparent: false,
     },
     animation: { kind: 'loop', duration: 5, startHold: 0.6, endHold: 0.6, easing: 'smooth' },
@@ -412,10 +438,15 @@ export function safeName(value: string) {
   );
 }
 
-export function projectAssetBytes(p: { pages: { slots: Record<Slot, SlotData> }[] }) {
-  return p.pages.reduce(
-    (total, page) =>
-      total + SLOT_IDS.reduce((n, slot) => n + (page.slots[slot].asset?.data.length ?? 0), 0),
-    0,
+export function projectAssetBytes(p: {
+  pages: { slots: Record<Slot, SlotData> }[];
+  view?: { backgroundImage?: { data: string } | null };
+}) {
+  return (
+    p.pages.reduce(
+      (total, page) =>
+        total + SLOT_IDS.reduce((n, slot) => n + (page.slots[slot].asset?.data.length ?? 0), 0),
+      0,
+    ) + (p.view?.backgroundImage?.data.length ?? 0)
   );
 }

@@ -301,6 +301,16 @@ export const en = {
   'bg.blue': 'Sky',
   'bg.sand': 'Sand',
   'bg.night': 'Night',
+  'bg.black': 'Black',
+  'bg.custom': 'Custom',
+  'aria.bgColor': 'Custom canvas color',
+  'aria.bgImage': 'Upload background image',
+  'action.uploadBgImage': 'Image…',
+  'action.removeBgImage': 'Remove image',
+  'hint.bgImage':
+    'The image fills the whole canvas; a different ratio gets cropped. Best ratio: {w} × {h} px — the current output size.',
+  'hint.bgCustom':
+    'Pick any color, or upload an image. Images fill the canvas and are cropped when the ratio differs.',
   'output.wide': 'Wide · 1600 × 1000',
   'output.tall': 'Tall · 1080 × 1350',
   'output.square': 'Square · 1200 × 1200',

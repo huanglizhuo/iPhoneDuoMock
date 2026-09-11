@@ -45,6 +45,19 @@ describe('project boundary', () => {
     expect(SPECS.landscape.width).toBe(2853);
     expect(SPECS.portrait.height).toBe(2853);
   });
+  it('fills custom background defaults for legacy projects and validates them', () => {
+    const legacy = JSON.parse(JSON.stringify(initialProject()));
+    delete legacy.view.backgroundColor;
+    delete legacy.view.backgroundImage;
+    const parsed = projectSchema.parse(legacy);
+    expect(parsed.view.backgroundColor).toMatch(/^#[0-9a-f]{6}$/i);
+    expect(parsed.view.backgroundImage).toBeNull();
+    parsed.view.backgroundColor = 'red';
+    expect(projectSchema.safeParse(parsed).success).toBe(false);
+    parsed.view.backgroundColor = '#232a36';
+    parsed.view.backgroundImage = { name: 'x', data: 'https://site/bg.png', width: 10, height: 10 };
+    expect(projectSchema.safeParse(parsed).success).toBe(false);
+  });
 });
 describe('deterministic timeline', () => {
   const a = {
