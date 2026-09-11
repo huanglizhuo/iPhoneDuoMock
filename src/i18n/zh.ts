@@ -138,7 +138,7 @@ export const zh = {
   'hint.outputAnimation': '视频最长边 1280 px · GIF 最长边 640 px',
   'hint.outputImage': 'PNG 按所选尺寸导出，保持界面比例。',
   'demo.description':
-    '缺图时的占位画面使用 Apple 官网 iPhone Duo 的官方锁屏演示图，上传素材前即可体验各种形态与导出。',
+    '缺图时的占位画面使用 Apple 官网商品图册中的 iPhone Duo 官方壁纸，上传素材前即可体验各种形态与导出。',
   'demo.note': '演示图仅用于展示工具能力，上传你的截图即可生成真实效果图与动画。',
   'demo.link': '查看 Apple 官网 iPhone Duo ↗',
   'footer.local': '100% 浏览器本地处理',
@@ -156,7 +156,7 @@ export const zh = {
     'PNG 用于展示，MP4/WebM/GIF 用于宣传。批量 ZIP 只包含实际上传的场景。保存项目文件可携带全部截图。',
   'help.privacyNote': '素材不会上传。自动保存仅在当前浏览器内；清理浏览器数据前，请下载项目备份。',
   'help.assetsNote':
-    '设备采用 Apple 官网公开的网格与开合动画，材质及屏幕效果在本地渲染；占位画面为 Apple 官网 iPhone Duo 官方锁屏演示图。没有上传素材时会明确显示“Apple 示例”，不会生成自动适配结果。',
+    '设备采用 Apple 官网公开的网格与开合动画，材质及屏幕效果在本地渲染；占位画面为 Apple 官网 iPhone Duo 官方壁纸。没有上传素材时会明确显示“Apple 示例”，不会生成自动适配结果。',
   'help.storeNote':
     'App Store App Preview 需要以 App 自身录屏为基础；本工具的设备动画用于宣传。截图规范参考日期：2026-09-10。',
   'help.appleSpecs': '查看 Apple 截图规格 ↗',

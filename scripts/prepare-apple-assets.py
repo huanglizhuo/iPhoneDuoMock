@@ -49,24 +49,45 @@ def decode_ktx(name):
     return Image.frombytes('RGBA', (width, height), rgba, 'raw', 'BGRA').convert('RGB')
 
 
-# Placeholder demo screens: Apple's own lock screen imagery from the iPhone Duo
-# viewer. inner is 2048x1441 (inner landscape ratio), outer is exactly 1398x2034.
-# Portrait/standing variants are centre crops so every file matches its slot spec.
+# Placeholder demo screens: the wallpaper from the page's #product-gallery
+# viewer, statically composited from its parallax layers (sky / far dunes /
+# hills / close dunes). The layers are opaque strips whose soft edges are
+# baked into RGB, so simple bottom-up overlapping reproduces the scene.
 demo = pathlib.Path('public/demo/apple')
 demo.mkdir(parents=True, exist_ok=True)
-inner = decode_ktx('lockscreen_ui_inner-wallpaper_png.ktx')
-outer = decode_ktx('lockscreen_ui_outer-wallpaper_png.ktx')
-assert inner.size == (2048, 1441) and outer.size == (1398, 2034)
-inner.resize((2853, 2007), Image.LANCZOS).save(demo / 'inner.png', optimize=True)
-portrait_width = round(inner.height * 2007 / 2853)
-inner.crop(
-    ((inner.width - portrait_width) // 2, 0, (inner.width + portrait_width) // 2, inner.height)
-).resize((2007, 2853), Image.LANCZOS).save(demo / 'inner-portrait.png', optimize=True)
-landscape_height = round(inner.width * 1398 / 2034)
-inner.crop(
-    (0, (inner.height - landscape_height) // 2, inner.width, (inner.height + landscape_height) // 2)
-).resize((2034, 1398), Image.LANCZOS).save(demo / 'outer-landscape.png', optimize=True)
-outer.save(demo / 'outer.png', optimize=True)
+layers = {
+    part: decode_ktx(f'{name}_cropped-wallpaper_png.ktx')
+    for part, name in [
+        ('sky', 'sky_3k'),
+        ('far', 'dune_far_3k'),
+        ('hills', 'hills_5k'),
+        ('close', 'dune_close_3k'),
+    ]
+}
+
+
+def compose_wallpaper(width, height):
+    canvas = Image.new('RGB', (width, height))
+    dune_share = 0.62 if width < height else 0.55
+    sky = layers['sky'].resize((width, round(height * (1 - dune_share))), Image.LANCZOS)
+    canvas.paste(sky, (0, 0))
+    band = round(height * dune_share)
+    close = layers['close'].resize((width, round(band * 0.66)), Image.LANCZOS)
+    hills = layers['hills'].resize((width, round(band * 0.16)), Image.LANCZOS)
+    far = layers['far'].resize((width, round(band * 0.13)), Image.LANCZOS)
+    canvas.paste(far, (0, height - close.height - hills.height + round(band * 0.05)))
+    canvas.paste(hills, (0, height - close.height - round(hills.height * 0.35)))
+    canvas.paste(close, (0, height - close.height))
+    return canvas
+
+
+for name, width, height in [
+    ('inner', 2853, 2007),
+    ('inner-portrait', 2007, 2853),
+    ('outer', 1398, 2034),
+    ('outer-landscape', 2034, 1398),
+]:
+    compose_wallpaper(width, height).save(demo / f'{name}.png', optimize=True)
 print(
     f'Prepared {len(model["meshes"])} meshes, {len(model["images"])} textures, '
     f'{len(model["animations"])} animations, 4 demo screens'
