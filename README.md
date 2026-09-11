@@ -68,7 +68,7 @@ More details in [docs/PRD.md](docs/PRD.md), [docs/IMPLEMENTATION_PLAN.md](docs/I
 - [DuoLikeAnimation](https://github.com/elijah-semyonov/DuoLikeAnimation) — inspiration for the open/close animation approach.
 - Codex Astra — this project was built with the help of the Codex Astra coding agent.
 
-Default placeholder screens reproduce the wallpaper from Apple's iPhone Duo product gallery ([apple.com/sg/iphone-duo](https://www.apple.com/sg/iphone-duo)), used only to demonstrate the tool.
+Default placeholder screens reproduce the lock screen from Apple's iPhone Duo product gallery ([apple.com/sg/iphone-duo](https://www.apple.com/sg/iphone-duo)), used only to demonstrate the tool.
 
 ## License
 

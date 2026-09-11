@@ -145,7 +145,7 @@ export const en = {
   'hint.outputAnimation': 'Video max edge 1280 px · GIF max edge 640 px',
   'hint.outputImage': 'PNG exports at the selected size, keeping the UI ratio.',
   'demo.description':
-    'Placeholder screens use the official iPhone Duo wallpaper from the apple.com product gallery, so you can explore poses and exports before uploading anything.',
+    'Placeholder screens reproduce the official iPhone Duo lock screen — dune wallpaper, 9:41 clock and all — from the apple.com product gallery, so you can explore poses and exports before uploading anything.',
   'demo.note':
     'Demo images are for showcasing only — upload your own screens to generate real mockups and animations.',
   'demo.link': 'See iPhone Duo on apple.com ↗',
@@ -167,7 +167,7 @@ export const en = {
   'help.privacyNote':
     'Assets never leave your device. Autosave stays in this browser; download a project backup before clearing browser data.',
   'help.assetsNote':
-    'The device uses the mesh and fold animation published on the Apple website; materials and screen effects are rendered locally. Placeholder screens are Apple’s official iPhone Duo wallpaper. Until you upload assets, screens are clearly marked "Apple demo" — nothing is auto-adapted.',
+    'The device uses the mesh and fold animation published on the Apple website; materials and screen effects are rendered locally. Placeholder screens reproduce Apple’s official iPhone Duo lock screen. Until you upload assets, screens are clearly marked "Apple demo" — nothing is auto-adapted.',
   'help.storeNote':
     'App Store App Previews must be based on real app screen recordings; this tool’s device animation is for promotion. Screenshot specs referenced on 2026-09-10.',
   'help.appleSpecs': 'View Apple screenshot specs ↗',
