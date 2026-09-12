@@ -35,7 +35,6 @@ export const en = {
   'action.openProject': 'Open project',
   'action.saveProject': 'Save project',
   'action.export': 'Export',
-  'action.makeScreenshots': 'Make screenshots',
   'action.addPage': 'Add page',
   'action.duplicatePage': 'Duplicate page',
   'action.deletePage': 'Delete page',
@@ -209,6 +208,11 @@ export const en = {
   'export.busy': 'Working…',
   'export.regenerate': 'Regenerate',
   'export.generate': 'Generate & download',
+  'export.allowAndGenerate': 'Allow capture & generate',
+  'export.retryCapture': 'Retry capture',
+  'export.browserPermissionTitle': 'Current-tab capture permission required',
+  'export.browserPermissionBody':
+    'Choose this Duo Studio tab in the browser prompt. The app captures each web viewport locally in high-resolution tiles, stops sharing immediately, and then builds the selected file. Nothing is uploaded. Pause page animations and video to avoid seams; on displays below the selected pixel ratio, embedded text or images may still be interpolated.',
   'browser.more': 'More options',
   'browser.site': 'Website',
   'browser.address': 'Site address',
@@ -236,7 +240,8 @@ export const en = {
     'Some sites refuse iframe embedding, and HTTPS pages may block HTTP content. The browser cannot reliably tell whether a cross-origin page rendered — try opening the original site.',
   'browser.helpSync':
     'Inner and outer screens — and the two halves of a static inner screen — use separate page viewports, so clicks, scrolling, and login state cannot sync across them. This simulates layout sizes only, not iOS Safari, UA, or native folding APIs.',
-  'browser.helpExport': 'To export images or videos, switch to Screenshots and upload shots.',
+  'browser.helpExport':
+    'Export requires permission to capture this browser tab. Each live iframe viewport is captured locally as a temporary screenshot, then passed to the same image and animation exporter used by Screenshots.',
   'browser.innerFrame': 'Duo inner screen page',
   'browser.innerLeftFrame': 'Duo inner screen other half',
   'browser.outerFrame': 'Duo outer screen page',
@@ -254,8 +259,21 @@ export const en = {
   'errors.canvas': 'Canvas is not supported in this browser',
   'errors.pngExport': 'PNG export failed',
   'errors.urlScheme': 'Enter an HTTP or HTTPS site address without credentials',
-  'errors.browserExport':
-    'Browser mode cannot export directly; switch to Screenshots and upload shots',
+  'errors.captureUnsupported':
+    'This browser does not support tab capture; try current Chrome or Edge',
+  'errors.capturePermission':
+    'Tab capture was not allowed. Retry and choose this Duo Studio tab in the sharing prompt.',
+  'errors.captureBusy': 'The tab could not be captured. Stop another screen share and retry.',
+  'errors.captureCancelled': 'Tab capture was cancelled. Retry when you are ready.',
+  'errors.captureWrongSurface': 'Choose a browser tab—not a window or screen—then retry.',
+  'errors.captureWrongTab': 'The selected tab was not Duo Studio. Retry and choose this tab.',
+  'errors.captureFailed': 'Tab capture failed: {reason}',
+  'errors.captureEmpty': 'The selected share has no video track. Retry and choose this tab.',
+  'errors.captureEnded': 'Tab sharing ended before every viewport was captured. Retry the export.',
+  'errors.captureTimeout': 'No captured frame arrived. Keep this tab visible and retry.',
+  'errors.captureFrameMissing':
+    'The live browser frame is not ready. Close Export, reload it, and retry.',
+  'errors.captureRequired': 'Capture the live browser viewports before starting the exporter',
   'errors.rawMissing': 'Upload a real screenshot for this scene first',
   'errors.rawSize': 'Raw UI requires {required} px; got {actual} px',
   'errors.missingSlots': 'Still needed: {slots} — or enable demo preview',

@@ -16,7 +16,7 @@ A foldable-phone screenshot studio that runs entirely in your browser. Place you
 
 - **Six device poses** — closed, landscape, portrait, seated, standing, and free fold with a live slider.
 - **Screenshot workbench** — upload outer/inner shots per page, fit or crop them, and manage up to 20 pages per project.
-- **Browser simulation** — load any embeddable website and watch it reflow across the inner and outer screens while folding.
+- **Browser simulation** — load any embeddable website, watch it reflow across the inner and outer screens, and export it through an authorised current-tab capture that stays local.
 - **Local-first export** — PNG stills, frame-by-frame MP4/WebM (30 fps), GIF loops (12 fps), a per-page PNG ZIP bundle, and strictly-sized raw UI PNGs.
 - **Portable projects** — save a `.duo.json` file carrying every screenshot; autosave keeps working in the browser via IndexedDB.
 - **English & Chinese UI, dark mode** — switch languages and themes from the top bar.

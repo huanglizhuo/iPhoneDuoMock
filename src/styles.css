@@ -1818,6 +1818,56 @@ h1 {
   max-width: none;
   background: var(--surface);
 }
+
+/* During an authorised tab capture, expose one flat web viewport and hide editor chrome. */
+html[data-browser-capture='true'] :where(#root *) {
+  visibility: hidden !important;
+}
+html[data-browser-capture='true'] .workspace,
+html[data-browser-capture='true'] .main-workspace,
+html[data-browser-capture='true'] .canvas-area,
+html[data-browser-capture='true'] .artboard-wrap,
+html[data-browser-capture='true'] .stage-canvas,
+html[data-browser-capture='true'] .web-overlay,
+html[data-browser-capture-screen='inner'] .web-surface[data-screen='inner'],
+html[data-browser-capture-screen='inner'] .web-surface[data-screen='inner'] iframe,
+html[data-browser-capture-screen='outer'] .web-surface[data-screen='outer'],
+html[data-browser-capture-screen='outer'] .web-surface[data-screen='outer'] iframe {
+  visibility: visible !important;
+}
+html[data-browser-capture='true'] .stage-canvas,
+html[data-browser-capture='true'] .web-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2000;
+  width: 100vw !important;
+  height: 100dvh !important;
+  overflow: hidden !important;
+  background: #000;
+}
+html[data-browser-capture='true'] .web-surface {
+  visibility: hidden !important;
+}
+html[data-browser-capture='true'] .web-surface[data-screen] {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  transform: none;
+  clip-path: none !important;
+  mask-image: none !important;
+  overflow: hidden !important;
+  background: #fff;
+}
+html[data-browser-capture='true'] .web-surface iframe {
+  left: var(--capture-frame-left, 0px) !important;
+  top: var(--capture-frame-top, 0px) !important;
+  width: var(--capture-frame-width) !important;
+  height: var(--capture-frame-height) !important;
+  transform: scale(var(--capture-frame-scale-x), var(--capture-frame-scale-y)) !important;
+  transform-origin: 0 0 !important;
+  pointer-events: none !important;
+}
 .web-status {
   position: absolute;
   bottom: 8px;
@@ -1993,6 +2043,10 @@ h1 {
   gap: 7px;
   white-space: nowrap;
 }
+.workspace-export {
+  margin-left: auto;
+  white-space: nowrap;
+}
 .advanced-toggle.active {
   color: var(--accent);
   background: var(--accent-wash);
@@ -2137,7 +2191,7 @@ h1 {
   flex-wrap: wrap;
 }
 .simple-ui .advanced-toggle {
-  margin-left: auto;
+  margin-left: 0;
 }
 @media (max-width: 36rem) {
   .quick-scenes {

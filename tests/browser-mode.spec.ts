@@ -1,4 +1,177 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+
+async function mockTabCapture(page: Page, rejectFirst = false) {
+  await page.addInitScript(
+    ({ failFirst }) => {
+      let attempts = 0;
+      let captureHandle = '';
+      Object.defineProperty(navigator, 'mediaDevices', {
+        configurable: true,
+        value: {
+          setCaptureHandleConfig: ({ handle }: { handle: string }) => {
+            captureHandle = handle;
+            Object.assign(window, { __captureHandleForTest: handle });
+          },
+          getDisplayMedia: async () => {
+            attempts += 1;
+            if (failFirst && attempts === 1)
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            const canvas = document.createElement('canvas');
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            const context = canvas.getContext('2d')!;
+            const paint = () => {
+              const styles = document.documentElement.style;
+              const offsetX = Math.round(
+                -Number.parseFloat(styles.getPropertyValue('--capture-frame-left') || '0') *
+                  (canvas.width / innerWidth),
+              );
+              const offsetY = Math.round(
+                -Number.parseFloat(styles.getPropertyValue('--capture-frame-top') || '0') *
+                  (canvas.height / innerHeight),
+              );
+              context.fillStyle = `rgb(${40 + Math.floor(offsetX / canvas.width) * 60}, ${
+                30 + Math.floor(offsetY / canvas.height) * 60
+              }, 180)`;
+              context.fillRect(0, 0, canvas.width, canvas.height);
+            };
+            paint();
+            window.setInterval(paint, 50);
+            const stream = canvas.captureStream(30);
+            const track = stream.getVideoTracks()[0];
+            track.getSettings = () =>
+              ({
+                width: canvas.width,
+                height: canvas.height,
+                displaySurface: 'browser',
+              }) as MediaTrackSettings;
+            Object.assign(track, { getCaptureHandle: () => ({ handle: captureHandle }) });
+            return stream;
+          },
+        },
+      });
+    },
+    { failFirst: rejectFirst },
+  );
+}
+
+test('browser workspace exposes export immediately before Advanced', async ({ page }) => {
+  await mockTabCapture(page);
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Browser sim', exact: false })).toBeEnabled();
+  await page.getByRole('button', { name: 'Browser sim', exact: false }).click();
+
+  const toolbar = page.locator('.workspace-toolbar');
+  const exportButton = toolbar.getByRole('button', { name: 'Export', exact: true });
+  const advancedButton = toolbar.getByRole('button', { name: 'Advanced', exact: true });
+  await expect(exportButton).toBeVisible();
+  await expect
+    .poll(() =>
+      toolbar
+        .getByRole('button')
+        .allTextContents()
+        .then(
+          (labels) =>
+            labels.findIndex((label) => label.trim() === 'Export') <
+            labels.findIndex((label) => label.includes('Advanced')),
+        ),
+    )
+    .toBe(true);
+  await expect(toolbar.locator('.workspace-export + .advanced-toggle')).toHaveCount(1);
+  for (const width of [320, 375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect(exportButton).toBeVisible();
+    await expect(advancedButton).toBeVisible();
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1))
+      .toBe(true);
+  }
+
+  const innerFrame = page.locator('.web-surface[data-screen="inner"] iframe');
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    root.dataset.browserCapture = 'true';
+    root.dataset.browserCaptureScreen = 'inner';
+    root.style.setProperty('--capture-frame-width', '951px');
+    root.style.setProperty('--capture-frame-height', '669px');
+    root.style.setProperty('--capture-frame-scale-x', '1');
+    root.style.setProperty('--capture-frame-scale-y', '1');
+    root.style.setProperty('--capture-frame-left', '0px');
+    root.style.setProperty('--capture-frame-top', '0px');
+  });
+  await expect(innerFrame).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Export', exact: true })).toBeHidden();
+  await page.evaluate(() => {
+    const root = document.documentElement;
+    delete root.dataset.browserCapture;
+    delete root.dataset.browserCaptureScreen;
+    for (const name of [
+      '--capture-frame-width',
+      '--capture-frame-height',
+      '--capture-frame-scale-x',
+      '--capture-frame-scale-y',
+      '--capture-frame-left',
+      '--capture-frame-top',
+    ])
+      root.style.removeProperty(name);
+  });
+
+  await exportButton.click();
+  await expect(page.getByRole('dialog', { name: 'Take your work outside.' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /PNG image/ })).toBeVisible();
+  await page.getByRole('button', { name: /Raw UI PNG/ }).click();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Allow capture & generate' }).click();
+  const exported = await download;
+  await expect(exported.suggestedFilename()).toMatch(/-ui\.png$/);
+  const path = await exported.path();
+  const bytes = [...(await readFile(path!))];
+  const pixels = await page.evaluate(async (data) => {
+    const image = await createImageBitmap(new Blob([new Uint8Array(data)], { type: 'image/png' }));
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d')!;
+    context.drawImage(image, 0, 0);
+    return [
+      [10, 10],
+      [1439, 999],
+      [1440, 1000],
+      [image.width - 1, image.height - 1],
+    ].map(([x, y]) => [...context.getImageData(x, y, 1, 1).data]);
+  }, bytes);
+  expect(pixels).toEqual([
+    [40, 30, 180, 255],
+    [40, 30, 180, 255],
+    [100, 90, 180, 255],
+    [100, 150, 180, 255],
+  ]);
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          !document.documentElement.hasAttribute('data-browser-capture') &&
+          (window as Window & { __captureHandleForTest?: string }).__captureHandleForTest === '',
+      ),
+    )
+    .toBe(true);
+});
+
+test('browser export explains permission failure and can retry', async ({ page }) => {
+  await mockTabCapture(page, true);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Browser sim', exact: false }).click();
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  await expect(page.getByText('Current-tab capture permission required')).toBeVisible();
+  await page.getByRole('button', { name: 'Allow capture & generate' }).click();
+  await expect(page.getByRole('alert')).toContainText('not allowed');
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Retry capture' }).click();
+  await expect((await download).suggestedFilename()).toMatch(/\.png$/);
+});
+
 test('live browser keeps iframe state through folding and workspace switches preserve screenshots', async ({
   page,
 }) => {

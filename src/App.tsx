@@ -55,6 +55,7 @@ import { Stage } from './components/Stage';
 import { Modal } from './components/Modal';
 import { animationSize, exportProject, videoCapabilities } from './lib/export';
 import type { ExportKind } from './lib/export';
+import { captureBrowserProject } from './lib/browserCapture';
 import { t, useI18n } from './i18n';
 import type { DictionaryKey } from './i18n';
 
@@ -764,23 +765,6 @@ export default function App() {
             <ArrowDownToLine size={16} />
             <span>{t('action.saveProject')}</span>
           </button>
-          <button
-            className="button primary"
-            disabled={loadingFile || !loaded}
-            onClick={() => {
-              commit();
-              setPlaying(false);
-              if (project.workspace === 'browser')
-                change((p) => {
-                  p.workspace = 'screenshots';
-                });
-              else setModal('export');
-            }}
-          >
-            <Download size={16} />
-            {project.workspace === 'browser' ? t('action.makeScreenshots') : t('action.export')}
-            <span className="export-dot" />
-          </button>
           <span className="top-separator" />
           <a
             className="icon-button"
@@ -953,6 +937,19 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <button
+              className="workspace-export button primary"
+              disabled={loadingFile || !loaded}
+              onClick={() => {
+                commit();
+                setPlaying(false);
+                setModal('export');
+              }}
+            >
+              <Download size={16} />
+              {t('action.export')}
+              <span className="export-dot" />
+            </button>
             <button
               className={`advanced-toggle button quiet ${advanced ? 'active' : ''}`}
               aria-expanded={advanced}
@@ -1511,7 +1508,7 @@ export default function App() {
           {t('status.readingFile')}
         </div>
       )}
-      {modal === 'export' && project.workspace === 'screenshots' && (
+      {modal === 'export' && (
         <ExportModal project={shown} onClose={() => setModal(null)} initialRawSlot={slot} />
       )}
       {modal === 'delete' && (
@@ -1613,7 +1610,10 @@ function ExportModal({
     [result],
   );
   const animation = ['mp4', 'webm', 'gif'].includes(kind);
-  const missing = missingSlots(animation ? { ...project, mode: 'animation' } : project);
+  const browser = project.workspace === 'browser';
+  const missing = browser
+    ? []
+    : missingSlots(animation ? { ...project, mode: 'animation' } : project);
   const unavailable =
     kind === 'mp4'
       ? capabilities?.mp4 === false
@@ -1634,7 +1634,18 @@ function ExportModal({
     const controller = new AbortController();
     abort.current = controller;
     try {
-      const r = await exportProject(project, kind, controller.signal, setProgress, rawSlot);
+      const exportInput = browser
+        ? await captureBrowserProject(project, controller.signal, (value) =>
+            setProgress(value * 0.25),
+          )
+        : project;
+      const r = await exportProject(
+        exportInput,
+        kind,
+        controller.signal,
+        (value) => setProgress((browser ? 0.25 : 0) + value * (browser ? 0.75 : 1)),
+        rawSlot,
+      );
       if (controller.signal.aborted) return;
       const url = URL.createObjectURL(r.blob);
       setResult({ ...r, url });
@@ -1656,6 +1667,15 @@ function ExportModal({
     >
       <div className="export-body">
         <p className="modal-subtitle">{t('export.subtitle')}</p>
+        {browser && (
+          <div className="guide-note browser-capture-note">
+            <ShieldCheck size={19} />
+            <div>
+              <strong>{t('export.browserPermissionTitle')}</strong>
+              <p>{t('export.browserPermissionBody')}</p>
+            </div>
+          </div>
+        )}
         <fieldset disabled={busy} className="export-options">
           <div className="export-format-grid">
             {(
@@ -1702,10 +1722,12 @@ function ExportModal({
           <strong>
             {kind === 'zip'
               ? t('export.sceneCount', {
-                  count: project.pages.reduce(
-                    (n, p) => n + SLOT_IDS.filter((s) => resolveSlot(p, s).data.asset).length,
-                    0,
-                  ),
+                  count: browser
+                    ? SLOT_IDS.length
+                    : project.pages.reduce(
+                        (n, p) => n + SLOT_IDS.filter((s) => resolveSlot(p, s).data.asset).length,
+                        0,
+                      ),
                 })
               : `${spec.width} × ${spec.height} px`}
           </strong>
@@ -1794,7 +1816,15 @@ function ExportModal({
             onClick={() => void run()}
           >
             {busy ? <LoaderCircle className="spin" size={16} /> : <ArrowDownToLine size={16} />}{' '}
-            {busy ? t('export.busy') : result ? t('export.regenerate') : t('export.generate')}
+            {busy
+              ? t('export.busy')
+              : result
+                ? t('export.regenerate')
+                : browser && error
+                  ? t('export.retryCapture')
+                  : browser
+                    ? t('export.allowAndGenerate')
+                    : t('export.generate')}
           </button>
         </div>
       </div>

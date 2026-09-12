@@ -39,7 +39,7 @@ export async function exportProject(
   rawSlot: Slot = 'outer',
 ): Promise<ExportResult> {
   aborted(signal);
-  if (p.workspace === 'browser') throw new Error(t('errors.browserExport'));
+  if (p.workspace === 'browser') throw new Error(t('errors.captureRequired'));
   const page = currentPage(p);
   const base = `${safeName(p.name)}-${safeName(page.name)}`;
   if (kind === 'raw') {
