@@ -23,9 +23,11 @@
 
 ## 维护方式
 
-`scripts/generate-seo.mjs` 维护产品事实、语言版本、域名和仓库地址，生成首页、指南、sitemap、robots、404，以及 JSON-LD 对应 CSP 哈希。`npm run build` 自动先运行生成器。更换正式域名时先更新生成器的 origin，再重新构建；不要单独修改生成文件中的 canonical。
+`scripts/generate-seo.mjs` 维护产品事实、语言版本、域名、仓库地址与 `updated` 日期,生成首页、中英文指南、中英文规格页(`/specs/`、`/zh/specs/`)、sitemap(含 lastmod)、robots、404、llms.txt、IndexNow key 文件,以及 JSON-LD 对应 CSP 哈希。`npm run build` 自动先运行生成器。更换正式域名时先更新生成器的 origin,再重新构建;不要单独修改生成文件中的 canonical。
 
-指南样式位于 `public/guide.css`，分享图位于 `public/social/duo-studio.png`。没有增加运行时依赖。首页编辑器仍通过 React 运行，详细说明由独立静态页面承载。
+指南内嵌截图与折叠 GIF 由 `npm run capture:guide` 从运行中的应用自动采集(需本地 ffmpeg 与 ImageMagick);槽位尺寸必须与 `src/lib/project.ts` 的 `SPECS` 保持一致。更新内容时改生成器顶部的 `updated` 日期,部署后向 IndexNow 重新提交(完整流程见 [GEO-EXECUTION.md](GEO-EXECUTION.md))。
+
+指南样式位于 `public/guide.css`,分享图位于 `public/social/duo-studio.png`。没有增加运行时依赖。首页编辑器仍通过 React 运行,详细说明由独立静态页面承载。
 
 ## 验证结果
 

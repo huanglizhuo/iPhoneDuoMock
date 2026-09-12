@@ -98,6 +98,17 @@ a:focus-visible {
   outline: 3px solid #0066cc;
   outline-offset: 4px;
 }
+footer {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+  color: #6e6e73;
+  font-size: 14px;
+}
+footer p {
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
 @media (max-width: 480px) {
   header {
     padding: 16px;

@@ -14,6 +14,7 @@
     "format:check": "prettier --check src tests *.ts *.json",
     "test:webkit": "playwright test --config=playwright.webkit.config.ts",
     "prebuild": "node scripts/generate-seo.mjs",
+    "capture:guide": "node scripts/capture-guide-assets.mjs",
     "test:seo": "node tests/seo.mjs"
   },
   "dependencies": {

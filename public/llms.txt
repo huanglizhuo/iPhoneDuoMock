@@ -1,0 +1,16 @@
+# Duo Studio
+> Open-source, browser-based tool for iPhone Duo-style foldable phone mockups and folding animations from app screenshots. All processing is local; nothing is uploaded.
+
+## Pages
+- [Screenshot sizes and export specs](https://iduo.clothpath.com/specs/): Exact inner/outer screen pixel dimensions, six poses, export formats, resolutions and frame rates
+- [English guide](https://iduo.clothpath.com/guide/): How to make foldable mockups, preview embeddable websites, and export PNG, MP4, WebM or GIF
+- [中文指南](https://iduo.clothpath.com/zh/guide/): 折叠屏效果图制作与网页模拟使用指南
+- [截图尺寸与导出规格](https://iduo.clothpath.com/zh/specs/): 内外屏像素尺寸、六种姿态与导出格式
+- [Editor](https://iduo.clothpath.com/): Interactive editor (requires JavaScript)
+
+## Key facts
+- Inner screen: 2853 × 2007 px landscape (1.42:1), 2007 × 2853 px portrait
+- Outer screen: 1398 × 2034 px portrait, 2034 × 1398 px standing pose
+- Exports: PNG (scene-native up to 2853 × 2007), MP4/WebM 30 fps, GIF 12 fps, ZIP bundles
+- Privacy: screenshots are processed locally and never uploaded
+- Independent open-source project, not affiliated with Apple
