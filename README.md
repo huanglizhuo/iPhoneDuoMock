@@ -52,7 +52,11 @@ No server, Functions, API keys, or environment variables needed.
 | Build output directory | `dist` |
 | Node | 22 (`.node-version`) |
 
-`public/_headers` and `_redirects` ship with the build and configure CSP, static caching, and SPA fallback.
+`public/_headers` and `_redirects` ship with the build and configure CSP and static caching. A top-level `404.html` returns real not-found responses; the editor uses only `/` (there are no client-side path routes).
+
+## Search and sharing
+
+`npm run build` generates canonical/social metadata, English and Chinese static guides, robots.txt and sitemap.xml through `scripts/generate-seo.mjs`. The public origin is `https://iduo.clothpath.com`; update it in that script if moving domains. The guide pages need no JavaScript. `npm run test:seo` verifies built metadata and crawlable content. See [docs/SEO-GEO.md](docs/SEO-GEO.md) for validation and post-deployment checks.
 
 ## Limitations
 

@@ -12,7 +12,9 @@
     "test:e2e": "playwright test",
     "test:production": "npm run build && node tests/production-smoke.mjs",
     "format:check": "prettier --check src tests *.ts *.json",
-    "test:webkit": "playwright test --config=playwright.webkit.config.ts"
+    "test:webkit": "playwright test --config=playwright.webkit.config.ts",
+    "prebuild": "node scripts/generate-seo.mjs",
+    "test:seo": "node tests/seo.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.2",

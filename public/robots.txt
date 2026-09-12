@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://iduo.clothpath.com/sitemap.xml

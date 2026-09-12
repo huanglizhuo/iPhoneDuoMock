@@ -2,6 +2,11 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-src 'self' https: http:; frame-ancestors 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-X9MyJb3p1//e9yQX5vTy2mYSL2bZ+iwjMjTNs4p58pw=' 'sha256-Nw+bMf2AaB1+sapRg1myJjKE0cplTd7xVgAKOEZSUX8=' 'sha256-tTBMY4towwqzSZ5bicYDUR+NN6QvVmd63H5dxqgzhDE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; media-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-src 'self' https: http:; frame-ancestors 'self'
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+/browser-demo
+  X-Robots-Tag: noindex
+/browser-demo.html
+  X-Robots-Tag: noindex

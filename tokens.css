@@ -1,0 +1,51 @@
+/* Hallmark · Plain · native system typography · neutral paper / blue actions */
+:root {
+  --color-paper: oklch(98% 0.002 260);
+  --color-surface: oklch(100% 0 0);
+  --color-ink: oklch(24% 0.006 260);
+  --color-muted: oklch(49% 0.008 260);
+  --color-subtle: oklch(55% 0.008 260);
+  --color-rule: oklch(90% 0.004 260);
+  --color-hover: oklch(95% 0.004 260);
+  --color-accent: oklch(51% 0.19 255);
+  --color-accent-hover: oklch(46% 0.19 255);
+  --color-accent-wash: oklch(95% 0.026 255);
+  --color-focus: oklch(55% 0.19 255);
+  --color-shadow: oklch(20% 0.005 260 / 0.08);
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+  --font-display: var(--font-body);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --radius-input: 12px;
+  --radius-panel: 20px;
+  --radius-pill: 999px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-short: 150ms;
+}
+[data-theme='dark'] {
+  --color-paper: oklch(18% 0.003 260);
+  --color-surface: oklch(23% 0.005 260);
+  --color-ink: oklch(96% 0.002 260);
+  --color-muted: oklch(75% 0.008 260);
+  --color-subtle: oklch(68% 0.008 260);
+  --color-rule: oklch(34% 0.006 260);
+  --color-hover: oklch(29% 0.005 260);
+  --color-accent: oklch(73% 0.14 250);
+  --color-accent-hover: oklch(79% 0.12 250);
+  --color-accent-wash: oklch(29% 0.04 250);
+  --color-focus: oklch(73% 0.14 250);
+  --color-shadow: oklch(0% 0 0 / 0.2);
+}

@@ -672,32 +672,34 @@ export default function App() {
       }}
     >
       <header className="topbar">
-        <a className="brand" href="./" aria-label={t('aria.brandHome')}>
-          <span className="brand-mark">
-            <SceneIcon scene="fold" size={25} />
-          </span>
-          <span>
-            Duo<span className="brand-light"> Studio</span>
-          </span>
-        </a>
-        <span className="top-separator" />
-        <div className="project-title">
-          <input
-            aria-label={t('aria.projectName')}
-            value={project.name}
-            maxLength={60}
-            onChange={(e) =>
-              change((p) => {
-                p.name = e.target.value || t('project.unnamed');
-              }, false)
-            }
-            onBlur={commit}
-            disabled={!loaded || loadingFile}
-          />
-          <span className={saveState.error ? 'save-status error-text' : 'save-status'}>
-            <span className="status-dot" />
-            {t(saveState.key)}
-          </span>
+        <div className="document-identity">
+          <a className="brand" href="./" aria-label={t('aria.brandHome')}>
+            <span className="brand-mark">
+              <SceneIcon scene="fold" size={25} />
+            </span>
+            <span>
+              Duo<span className="brand-light"> Studio</span>
+            </span>
+          </a>
+          <span className="top-separator" />
+          <div className="project-title">
+            <input
+              aria-label={t('aria.projectName')}
+              value={project.name}
+              maxLength={60}
+              onChange={(e) =>
+                change((p) => {
+                  p.name = e.target.value || t('project.unnamed');
+                }, false)
+              }
+              onBlur={commit}
+              disabled={!loaded || loadingFile}
+            />
+            <span className={saveState.error ? 'save-status error-text' : 'save-status'}>
+              <span className="status-dot" />
+              {t(saveState.key)}
+            </span>
+          </div>
         </div>
         <div className="workspace-picker" aria-label={t('aria.workspace')}>
           <button
@@ -766,6 +768,14 @@ export default function App() {
             <span>{t('action.saveProject')}</span>
           </button>
           <span className="top-separator" />
+          <a
+            className="icon-button"
+            href={lang === 'zh' ? '/zh/guide/' : '/guide/'}
+            aria-label={lang === 'zh' ? '使用指南' : 'User guide'}
+            title={lang === 'zh' ? '使用指南' : 'User guide'}
+          >
+            <Info size={17} />
+          </a>
           <a
             className="icon-button"
             href={REPO_URL}
