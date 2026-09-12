@@ -227,11 +227,7 @@ export class DeviceRenderer {
       this.screens[i].emissiveMap = projection.texture;
     });
     this.screens[0].emissiveIntensity =
-      p.scene === 'standing'
-        ? 0.008
-        : p.scene === 'fold'
-          ? 0.55 + 0.45 * THREE.MathUtils.smoothstep(open, 0.4, 1)
-          : 1;
+      p.scene === 'fold' ? 0.55 + 0.45 * THREE.MathUtils.smoothstep(open, 0.4, 1) : 1;
     this.renderer.render(this.scene, this.camera);
     return this.renderer.domElement;
   }

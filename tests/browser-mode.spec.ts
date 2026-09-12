@@ -29,13 +29,18 @@ async function mockTabCapture(page: Page, rejectFirst = false) {
                   (canvas.width / innerWidth),
               );
               const offsetY = Math.round(
-                -Number.parseFloat(styles.getPropertyValue('--capture-frame-top') || '0') *
+                (16 - Number.parseFloat(styles.getPropertyValue('--capture-frame-top') || '16')) *
                   (canvas.height / innerHeight),
               );
               context.fillStyle = `rgb(${40 + Math.floor(offsetX / canvas.width) * 60}, ${
-                30 + Math.floor(offsetY / canvas.height) * 60
+                30 + Math.floor(offsetY / (canvas.height - 16)) * 60
               }, 180)`;
               context.fillRect(0, 0, canvas.width, canvas.height);
+              const marker = document.querySelector<HTMLElement>('[data-capture-marker]');
+              if (marker) {
+                context.fillStyle = marker.style.backgroundColor;
+                context.fillRect(0, 0, canvas.width, 16);
+              }
             };
             paint();
             window.setInterval(paint, 50);
@@ -137,8 +142,8 @@ test('browser workspace exposes export immediately before Advanced', async ({ pa
     context.drawImage(image, 0, 0);
     return [
       [10, 10],
-      [1439, 999],
-      [1440, 1000],
+      [1439, 983],
+      [1440, 984],
       [image.width - 1, image.height - 1],
     ].map(([x, y]) => [...context.getImageData(x, y, 1, 1).data]);
   }, bytes);
@@ -176,7 +181,8 @@ test('live browser keeps iframe state through folding and workspace switches pre
   page,
 }) => {
   await page.goto('/');
-  await expect(page.getByText('Saved to this browser')).toBeVisible();
+  await expect(page.getByText('Saved to this browser')).toBeAttached();
+  await page.locator('.screenshot-inputs > summary').click();
   await page.getByRole('button', { name: 'Inner screen', exact: true }).click();
   await page.getByLabel('Upload Inner · Landscape').setInputFiles('public/demo/apple/inner.png');
   await page.getByRole('button', { name: 'Browser sim', exact: false }).click();
@@ -198,6 +204,7 @@ test('live browser keeps iframe state through folding and workspace switches pre
       .frameLocator('iframe[title="Duo outer screen page"]')
       .getByText('Live CSS viewport: 466 × 678 px'),
   ).toBeVisible();
+  await page.locator('.browser-options > summary').click();
   await page.getByRole('button', { name: 'Rotate device', exact: true }).click();
   await expect(page.locator('iframe[title="Duo outer screen page"]')).toHaveCSS(
     'pointer-events',
@@ -205,6 +212,7 @@ test('live browser keeps iframe state through folding and workspace switches pre
   );
   await page.getByRole('button', { name: 'Screenshots', exact: true }).click();
   await expect(page.locator('iframe')).toHaveCount(0);
+  await page.locator('.screenshot-inputs > summary').click();
   await page.getByRole('button', { name: 'Inner screen', exact: true }).click();
   await expect(page.getByTitle('inner.png', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Export', exact: true })).toBeVisible();
@@ -223,7 +231,7 @@ test('live browser loads an external URL, refreshes and persists settings', asyn
     }),
   );
   await page.goto('/');
-  await expect(page.getByText('Saved to this browser')).toBeVisible();
+  await expect(page.getByText('Saved to this browser')).toBeAttached();
   await page.getByRole('button', { name: /Browser sim/ }).click();
   await page
     .getByRole('button', { name: /Landscape/ })
@@ -236,8 +244,9 @@ test('live browser loads an external URL, refreshes and persists settings', asyn
   await expect(inner.getByRole('button', { name: 'Clicked' })).toBeVisible();
   await page.getByLabel('Reload page').click();
   await expect(inner.getByRole('button', { name: 'External page' })).toBeVisible();
+  await page.getByRole('button', { name: 'Advanced', exact: true }).click();
   await page.getByLabel('Browser pixel ratio').selectOption('2');
-  await expect(page.getByText('Saved to this browser')).toBeVisible();
+  await expect(page.getByText('Saved to this browser')).toBeAttached();
   await page.reload();
   await expect(page.getByLabel('Site address')).toHaveValue('https://embed.example/demo');
   await expect(page.getByLabel('Browser pixel ratio')).toHaveValue('2');
@@ -248,23 +257,23 @@ test('live browser loads an external URL, refreshes and persists settings', asyn
       .toBe(true);
     await expect(page.getByRole('button', { name: /Browser sim/ })).toBeVisible();
     if (width === 375) {
-      await page.getByRole('button', { name: 'Enter / change URL ↗', exact: true }).click();
+      await page.getByLabel('Site address').click();
       await expect(page.getByLabel('Site address')).toBeFocused();
       await page.getByRole('button', { name: 'Open site', exact: true }).click();
-      await expect
-        .poll(() => page.locator('#duo-preview').evaluate((el) => el.getBoundingClientRect().top))
-        .toBeLessThan(160);
+      await expect(page.locator('#duo-preview')).toBeInViewport();
     }
   }
+  if ((await page.locator('.browser-options').getAttribute('open')) === null)
+    await page.locator('.browser-options > summary').click();
   await page.getByText('Blank or blocked page?').click();
   await expect(page.getByText(/refuse iframe embedding/)).toBeVisible();
 });
 
 test('live browser shares animation playback and all static scene controls', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Saved to this browser')).toBeVisible();
+  await expect(page.getByText('Saved to this browser')).toBeAttached();
   await page.getByRole('button', { name: /Browser sim/ }).click();
-  await page.getByRole('button', { name: 'Fold demo', exact: true }).click();
+  await page.getByRole('button', { name: 'Unfold', exact: true }).click();
   const before = await page.locator('iframe[title="Duo outer screen page"]').getAttribute('style');
   await page.getByLabel('Play animation').click();
   await expect(page.getByLabel('Pause animation')).toBeVisible();
@@ -289,3 +298,34 @@ test('live browser shares animation playback and all static scene controls', asy
   }
   await expect(page.locator('.canvas-error')).toHaveCount(0);
 });
+
+for (const [scene, width, height, slot] of [
+  ['Unfold', 2853, 2007, 'landscape'],
+  ['Closed', 1398, 2034, 'outer'],
+  ['Landscape', 2853, 2007, 'landscape'],
+  ['Portrait', 2007, 2853, 'portrait'],
+  ['Seated', 2007, 2853, 'seated'],
+  ['Standing', 2034, 1398, 'standing'],
+] as const) {
+  test(`browser ${scene} exports scene-sized PNG and selects matching raw UI`, async ({ page }) => {
+    await mockTabCapture(page);
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Browser sim', exact: false }).click();
+    await page
+      .getByRole('button', { name: new RegExp('^' + scene) })
+      .first()
+      .click();
+    await page.getByRole('button', { name: 'Export', exact: true }).click();
+    await page.getByRole('button', { name: /Raw UI PNG/ }).click();
+    await expect(page.getByLabel('Raw UI slot')).toHaveValue(slot);
+    await page.getByRole('button', { name: /^PNG image/ }).click();
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Allow capture & generate' }).click();
+    const file = await download;
+    const bytes = await readFile((await file.path())!);
+    // PNG IHDR dimensions verify the actual downloaded file, not just the dialog label.
+    expect(bytes.readUInt32BE(16)).toBe(width);
+    expect(bytes.readUInt32BE(20)).toBe(height);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  });
+}

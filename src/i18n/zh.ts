@@ -315,6 +315,7 @@ export const zh = {
   'hint.bgImage':
     '图片默认撑满整个画布，比例不同会被裁切。最佳比例：{w} × {h} px，与当前输出尺寸一致。',
   'hint.bgCustom': '可自选任意颜色，或上传图片。图片会撑满画布，比例不符时裁切显示。',
+  'output.scene': '跟随场景 · 自动尺寸与方向',
   'output.wide': '横版 · 1600 × 1000',
   'output.tall': '竖版 · 1080 × 1350',
   'output.square': '方形 · 1200 × 1200',

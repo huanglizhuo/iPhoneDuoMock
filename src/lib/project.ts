@@ -325,7 +325,7 @@ export const projectSchema = z
       easing: z.enum(['smooth', 'linear']),
     }),
     output: z.object({
-      size: z.enum(['wide', 'tall', 'square']),
+      size: z.enum(['scene', 'wide', 'tall', 'square']),
       storeSize: z.enum(['innerPortrait', 'innerLandscape', 'outerPortrait', 'outerLandscape']),
       layout: z.enum(['top', 'split']),
     }),
@@ -426,7 +426,7 @@ export function missingSlots(p: Project, page = currentPage(p)): Slot[] {
   return slots.filter((s) => !resolveSlot(page, s).data.asset);
 }
 export function dimensions(p: Project) {
-  return OUTPUT_SIZES[p.output.size];
+  return p.output.size === 'scene' ? SPECS[sceneSlot(p.scene)] : OUTPUT_SIZES[p.output.size];
 }
 export function safeName(value: string) {
   return (

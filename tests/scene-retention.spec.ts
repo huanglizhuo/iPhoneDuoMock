@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 test('fold slider preserves the selected static scene', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Saved to this browser')).toBeVisible();
+  await expect(page.getByText('Saved to this browser')).toBeAttached();
   for (const [name, id] of [
     ['Closed', 'closed'],
     ['Landscape', 'landscape'],

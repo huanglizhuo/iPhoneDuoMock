@@ -1414,6 +1414,7 @@ export default function App() {
                 })
               }
             >
+              <option value="scene">{t('output.scene')}</option>
               {Object.entries(OUTPUT_SIZES).map(([id, s]) => (
                 <option key={id} value={id}>
                   {s.label}
@@ -1580,9 +1581,15 @@ function ExportModal({
   initialRawSlot: Slot;
 }) {
   // Freeze the document for the whole export session; autosave/UI renders must not abort an encoder.
-  const [project] = useState(inputProject);
+  const [project, setExportProject] = useState<Project>(() =>
+    inputProject.workspace === 'browser'
+      ? { ...inputProject, output: { ...inputProject.output, size: 'scene' } }
+      : inputProject,
+  );
   const [kind, setKind] = useState<ExportKind>(project.mode === 'animation' ? 'mp4' : 'png'),
-    [rawSlot, setRawSlot] = useState(initialRawSlot);
+    [rawSlot, setRawSlot] = useState(
+      inputProject.workspace === 'browser' ? sceneSlot(inputProject.scene) : initialRawSlot,
+    );
   const [capabilities, setCapabilities] = useState<{ mp4: boolean; webm: boolean } | null>(null);
   const [busy, setBusy] = useState(false),
     [progress, setProgress] = useState(0),
@@ -1704,6 +1711,27 @@ function ExportModal({
               </button>
             ))}
           </div>
+          {browser && kind !== 'raw' && (
+            <label className="field-label">
+              {t('section.output')}
+              <select
+                value={project.output.size}
+                onChange={(e) => {
+                  const size = e.target.value as Project['output']['size'];
+                  setExportProject((p) => ({ ...p, output: { ...p.output, size } }));
+                  setResult(null);
+                  setError('');
+                }}
+              >
+                <option value="scene">{t('output.scene')}</option>
+                {Object.entries(OUTPUT_SIZES).map(([id, s]) => (
+                  <option value={id} key={id}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           {kind === 'raw' && (
             <label className="field-label">
               {t('field.rawSlot')}

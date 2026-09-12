@@ -47,29 +47,41 @@ async function waitForVideo(video: HTMLVideoElement, signal: AbortSignal) {
   });
 }
 
-async function waitForCapturedFrame(video: HTMLVideoElement, signal: AbortSignal) {
-  await frame();
-  await frame();
-  if (signal.aborted) throw new DOMException(t('export.abortError'), 'AbortError');
-  if (!('requestVideoFrameCallback' in video)) return;
-  await new Promise<void>((resolve, reject) => {
-    const done = () => signal.removeEventListener('abort', cancelled);
-    const timeout = window.setTimeout(() => {
-      done();
-      reject(new Error(t('errors.captureTimeout')));
-    }, 5000);
-    const cancelled = () => {
-      window.clearTimeout(timeout);
-      done();
-      reject(new DOMException(t('export.abortError'), 'AbortError'));
-    };
-    video.requestVideoFrameCallback(() => {
-      window.clearTimeout(timeout);
-      done();
-      resolve();
+async function waitForCapturedFrame(
+  video: HTMLVideoElement,
+  signal: AbortSignal,
+  isCurrentTile: () => boolean,
+) {
+  const deadline = performance.now() + 5000;
+  do {
+    if (performance.now() >= deadline) throw new Error(t('errors.captureTimeout'));
+    await frame();
+    await frame();
+    if (signal.aborted) throw new DOMException(t('export.abortError'), 'AbortError');
+    if (isCurrentTile()) return;
+    if (!('requestVideoFrameCallback' in video)) continue;
+    await new Promise<void>((resolve, reject) => {
+      const done = () => signal.removeEventListener('abort', cancelled);
+      const timeout = window.setTimeout(
+        () => {
+          done();
+          reject(new Error(t('errors.captureTimeout')));
+        },
+        Math.max(1, deadline - performance.now()),
+      );
+      const cancelled = () => {
+        window.clearTimeout(timeout);
+        done();
+        reject(new DOMException(t('export.abortError'), 'AbortError'));
+      };
+      video.requestVideoFrameCallback(() => {
+        window.clearTimeout(timeout);
+        done();
+        resolve();
+      });
+      signal.addEventListener('abort', cancelled, { once: true });
     });
-    signal.addEventListener('abort', cancelled, { once: true });
-  });
+  } while (!isCurrentTile());
 }
 
 function screenFor(slot: Slot) {
@@ -123,6 +135,14 @@ export async function captureBrowserProject(
   const track = stream.getVideoTracks()[0];
   const root = document.documentElement;
   const video = document.createElement('video');
+  // A reserved strip travels through the same compositor/capture stream as the iframe.
+  // Its changing color identifies the tile; exclude the strip from the exported pixels.
+  const marker = document.createElement('div');
+  marker.dataset.captureMarker = '';
+  marker.style.cssText =
+    'position:fixed;left:0;top:0;width:100vw;height:16px;z-index:2147483647;visibility:visible!important;pointer-events:none';
+  const probe = context(canvas(1, 1));
+  let tile = 0;
   const stop = () => stream.getTracks().forEach((item) => item.stop());
   if (signal.aborted) {
     stop();
@@ -150,6 +170,7 @@ export async function captureBrowserProject(
     captured.pages = [sourcePage];
     captured.activePageId = sourcePage.id;
     root.dataset.browserCapture = 'true';
+    (document.fullscreenElement ?? document.body).append(marker);
 
     for (let index = 0; index < SLOT_IDS.length; index++) {
       if (signal.aborted) throw new DOMException(t('export.abortError'), 'AbortError');
@@ -178,19 +199,31 @@ export async function captureBrowserProject(
         String(spec.height / cssHeight / captureScaleY),
       );
       const output = canvas(spec.width, spec.height);
-      for (let y = 0; y < spec.height; y += video.videoHeight) {
+      const stripHeight = Math.ceil(16 * captureScaleY);
+      const tileHeightLimit = video.videoHeight - stripHeight;
+      if (tileHeightLimit <= 0) throw new Error(t('errors.captureEmpty'));
+      for (let y = 0; y < spec.height; y += tileHeightLimit) {
         for (let x = 0; x < spec.width; x += video.videoWidth) {
           if (signal.aborted) throw new DOMException(t('export.abortError'), 'AbortError');
           if (!stream.active) throw new Error(t('errors.captureEnded'));
           root.style.setProperty('--capture-frame-left', `${-x / captureScaleX}px`);
-          root.style.setProperty('--capture-frame-top', `${-y / captureScaleY}px`);
-          await waitForCapturedFrame(video, signal);
+          root.style.setProperty('--capture-frame-top', `${(stripHeight - y) / captureScaleY}px`);
+          const stamp = ++tile;
+          const color = [stamp % 4, Math.floor(stamp / 4) % 4, Math.floor(stamp / 16) % 4].map(
+            (n) => 32 + n * 64,
+          );
+          marker.style.backgroundColor = `rgb(${color.join(',')})`;
+          await waitForCapturedFrame(video, signal, () => {
+            probe.drawImage(video, 8 * captureScaleX, 8 * captureScaleY, 1, 1, 0, 0, 1, 1);
+            const actual = probe.getImageData(0, 0, 1, 1).data;
+            return color.every((value, i) => Math.abs(actual[i] - value) < 16);
+          });
           const tileWidth = Math.min(video.videoWidth, spec.width - x);
-          const tileHeight = Math.min(video.videoHeight, spec.height - y);
+          const tileHeight = Math.min(tileHeightLimit, spec.height - y);
           context(output).drawImage(
             video,
             0,
-            0,
+            stripHeight,
             tileWidth,
             tileHeight,
             x,
@@ -216,6 +249,7 @@ export async function captureBrowserProject(
     signal.removeEventListener('abort', stop);
     stop();
     clearCaptureHandle();
+    marker.remove();
     video.pause();
     video.srcObject = null;
     delete root.dataset.browserCapture;

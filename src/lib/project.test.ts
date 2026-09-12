@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { initialProject, projectSchema, safeName, missingSlots, SPECS } from './project';
+import {
+  initialProject,
+  projectSchema,
+  safeName,
+  missingSlots,
+  SPECS,
+  dimensions,
+} from './project';
 import { openingAt, totalDuration } from './timeline';
 import { fitRect } from './assets';
 describe('project boundary', () => {
@@ -39,6 +46,19 @@ describe('project boundary', () => {
   });
   it('preserves Chinese names but strips unsafe path components', () => {
     expect(safeName('../山野/a:b')).toBe('--山野-a-b');
+  });
+  it('keeps scene output sizing through capture and respects fixed-size overrides', () => {
+    const p = initialProject();
+    p.workspace = 'browser';
+    p.output.size = 'scene';
+    p.scene = 'closed';
+    expect(dimensions(p)).toMatchObject({ width: 1398, height: 2034 });
+    const captured = projectSchema.parse({ ...p, workspace: 'screenshots' });
+    expect(dimensions(captured)).toEqual(dimensions(p));
+    captured.scene = 'landscape';
+    expect(dimensions(captured)).toMatchObject({ width: 2853, height: 2007 });
+    captured.output.size = 'square';
+    expect(dimensions(captured)).toMatchObject({ width: 1200, height: 1200 });
   });
   it('keeps official inner and outer dimensions distinct', () => {
     expect(SPECS.outer.width).toBe(1398);
