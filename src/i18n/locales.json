@@ -1,0 +1,38 @@
+{
+  "en": {
+    "label": "English",
+    "htmlLang": "en",
+    "ogLocale": "en_US",
+    "path": "/",
+    "guide": "User guide",
+    "title": "Duo Studio — Foldable Phone Mockups & Animations",
+    "description": "Create foldable phone mockups from your app screenshots. Preview embeddable websites and export PNG, MP4, WebM or GIF locally in your browser."
+  },
+  "zh": {
+    "label": "简体中文",
+    "htmlLang": "zh-Hans",
+    "ogLocale": "zh_CN",
+    "path": "/zh/",
+    "guide": "使用指南",
+    "title": "Duo Studio — 折叠屏效果图与开合动画制作工具",
+    "description": "上传 App 内外屏截图，制作折叠屏设备效果图与开合动画，预览可嵌入网页，并在浏览器本地导出 PNG、MP4、WebM 或 GIF。"
+  },
+  "ja": {
+    "label": "日本語",
+    "htmlLang": "ja",
+    "ogLocale": "ja_JP",
+    "path": "/ja/",
+    "guide": "使い方",
+    "title": "Duo Studio — 折りたたみスマホのモックアップとアニメーション",
+    "description": "アプリのスクリーンショットから折りたたみ端末のモックアップを作成。埋め込み対応サイトをプレビューし、PNG・MP4・WebM・GIF をブラウザ内で書き出せます。"
+  },
+  "fr": {
+    "label": "Français",
+    "htmlLang": "fr",
+    "ogLocale": "fr_FR",
+    "path": "/fr/",
+    "guide": "Guide d’utilisation",
+    "title": "Duo Studio — Maquettes de smartphones pliables et animations",
+    "description": "Créez des maquettes de smartphones pliables avec vos captures, prévisualisez des sites intégrables et exportez en PNG, MP4, WebM ou GIF dans votre navigateur."
+  }
+}

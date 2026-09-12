@@ -6,8 +6,6 @@
 
 [![Duo Studio — 上传、折叠、导出](docs/media/duo-studio-overview.gif)](docs/media/duo-studio-overview.mp4)
 
-[观看 8 秒演示](docs/media/duo-studio-overview.mp4)
-
 ## 如何使用
 
 1. **添加内容** — 上传内外屏截图，或切换「网页模拟」输入网址。

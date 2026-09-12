@@ -318,20 +318,6 @@ a.icon-button:hover {
   overflow: hidden;
   flex-shrink: 0;
 }
-.lang-switch button {
-  padding: 0 9px;
-  font-size: 11px;
-  font-weight: 550;
-  color: var(--muted);
-  line-height: 1;
-}
-.lang-switch button + button {
-  border-left: 1px solid var(--line);
-}
-.lang-switch button.active {
-  background: var(--accent-wash);
-  color: var(--accent);
-}
 .history-button {
   width: 26px;
 }
@@ -2141,7 +2127,6 @@ html[data-browser-capture='true'] .web-surface iframe {
 .simple-ui .top-actions > .quiet,
 .simple-ui .top-actions > .history-button,
 .simple-ui .top-actions > .top-separator,
-.simple-ui .top-actions > .lang-switch,
 .simple-ui .artboard-meta,
 .simple-ui .artboard-foot,
 .simple-ui .timeline-label small,
@@ -2298,4 +2283,19 @@ html[data-browser-capture='true'] .web-surface iframe {
 }
 .artboard-wrap:has(.fullscreen-fallback) {
   overflow: visible;
+}
+
+select.lang-switch {
+  width: 108px;
+  min-width: 0;
+  padding: 7px 8px;
+  color: inherit;
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+select.lang-switch:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 3px;
 }

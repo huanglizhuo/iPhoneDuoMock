@@ -1,10 +1,14 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { translatedArticles } from './site-translations.mjs';
+import { mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+const locales = JSON.parse(
+  readFileSync(new URL('../src/i18n/locales.json', import.meta.url), 'utf8'),
+);
 const origin = 'https://iduo.clothpath.com';
 const repo = 'https://github.com/huanglizhuo/iPhoneDuoMock';
 // Bump `updated` whenever guide/spec content changes; it feeds the visible
 // footer, JSON-LD dateModified and sitemap lastmod.
 const published = '2026-09-12';
-const updated = '2026-09-12';
+const updated = '2026-09-13';
 const indexNowKey = '680382cc15ef6d4d80c7ee1b39691099';
 const e = (s) => s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;');
 const months = [
@@ -24,6 +28,8 @@ const months = [
 const [y, m, d] = updated.split('-').map(Number);
 const dateHtml = {
   en: `Updated <time datetime="${updated}">${months[m - 1]} ${d}, ${y}</time>`,
+  ja: `更新日 <time datetime="${updated}">${y}年${m}月${d}日</time>`,
+  fr: `Mis à jour le <time datetime="${updated}">${d}/${m}/${y}</time>`,
   zh: `更新于 <time datetime="${updated}">${y} 年 ${m} 月 ${d} 日</time>`,
 };
 // Captured by `npm run capture:guide` from the running app.
@@ -57,8 +63,22 @@ const images = {
     altZh: 'Duo Studio 导出面板,列出 PNG、MP4、WebM、GIF 与 ZIP 场景包选项',
   },
 };
+const imageAlt = {
+  ja: {
+    fold: 'Duo Studio の開閉アニメーション',
+    workspace: 'Duo Studio のスクリーンショット編集画面',
+    poses: '自由開閉、閉じた状態、横向き、縦向き、卓上、スタンドの6つの姿勢',
+    export: 'PNG・MP4・WebM・GIF・ZIP の書き出し画面',
+  },
+  fr: {
+    fold: 'Animation de pliage dans Duo Studio',
+    workspace: 'Éditeur de captures Duo Studio',
+    poses: 'Six positions : pliage libre, fermé, paysage, portrait, assis et debout',
+    export: 'Options d’export PNG, MP4, WebM, GIF et ZIP',
+  },
+};
 const image = (key, lang, lazy = true) =>
-  `<img src="${images[key].src}" width="${images[key].width}" height="${images[key].height}" alt="${e(lang === 'zh' ? images[key].altZh : images[key].alt)}"${lazy ? ' loading="lazy"' : ''}>`;
+  `<img src="${images[key].src}" width="${images[key].width}" height="${images[key].height}" alt="${e(lang === 'zh' ? images[key].altZh : lang === 'ja' ? imageAlt.ja[key] : lang === 'fr' ? imageAlt.fr[key] : images[key].alt)}"${lazy ? ' loading="lazy"' : ''}>`;
 // Slot dimensions mirror SPECS in src/lib/project.ts; update both together.
 const sizeTable = {
   en: `<div class="table-wrap"><table><thead><tr><th>Screen</th><th>Used by pose</th><th>Recommended pixels</th><th>Aspect</th></tr></thead><tbody><tr><td>Inner, landscape</td><td>Unfold, Landscape</td><td>2853 × 2007</td><td>1.42:1</td></tr><tr><td>Inner, portrait</td><td>Portrait, Seated</td><td>2007 × 2853</td><td>1:1.42</td></tr><tr><td>Outer, portrait</td><td>Closed</td><td>1398 × 2034</td><td>1:1.45</td></tr><tr><td>Outer, landscape</td><td>Standing</td><td>2034 × 1398</td><td>1.45:1</td></tr></tbody></table></div>`,
@@ -87,7 +107,7 @@ const facts = {
       ],
       [
         'What screenshot sizes should I prepare?',
-        `<p>Prepare one screenshot per pose you plan to export. Duo Studio renders the iPhone Duo inner screen at 2853 × 2007 pixels in landscape and 2007 × 2853 pixels in portrait — a 1.42:1 aspect ratio — and the outer screen at 1398 × 2034 pixels, or 2034 × 1398 pixels for the standing pose. The dimensions come from the device model in the open-source repository, which is built from Apple’s official iPhone Duo webpage assets, so scene-native exports align with those screens pixel for pixel. PNG, JPEG and WebP images up to 4096 pixels per side are accepted; when the aspect ratio differs, Fit keeps the whole image with bars while Fill crops it to cover.</p>${sizeTable.en}${image('poses', 'en')}<p>The complete slot, pose and export tables live on the <a href="/specs/">screenshot sizes and export specs page</a>.</p>`,
+        `<p>Prepare one screenshot per pose you plan to export. Duo Studio renders the iPhone Duo inner screen at 2853 × 2007 pixels in landscape and 2007 × 2853 pixels in portrait — a 1.42:1 aspect ratio — and the outer screen at 1398 × 2034 pixels, or 2034 × 1398 pixels for the standing pose. These dimensions are the tool’s screenshot slot presets, not verified hardware specifications or App Store requirements. PNG, JPEG and WebP images up to 4096 pixels per side are accepted; when the aspect ratio differs, Fit keeps the whole image with bars while Fill crops it to cover.</p>${sizeTable.en}${image('poses', 'en')}<p>The complete slot, pose and export tables live on the <a href="/specs/">screenshot sizes and export specs page</a>.</p>`,
       ],
       [
         'Which mode should I use?',
@@ -133,7 +153,7 @@ const facts = {
       ],
       [
         '需要准备什么尺寸的截图?',
-        `<p>为每个要导出的姿态准备一张截图。Duo Studio 将 iPhone Duo 内屏按横屏 2853 × 2007 像素、竖屏 2007 × 2853 像素(约 1.42:1)渲染,外屏为 1398 × 2034 像素,站立姿态为 2034 × 1398 像素。这些尺寸来自开源仓库中的设备模型,该模型基于 Apple 官网 iPhone Duo 页面素材构建,因此按场景原始尺寸导出的截图与这些屏幕逐像素对齐。工具接受每边最长 4096 像素的 PNG、JPEG 和 WebP 图片;比例不一致时,「适应」保留完整图像并留边,「填充」裁剪铺满。</p>${sizeTable.zh}${image('poses', 'zh')}<p>完整的槽位、姿态与导出规格表见<a href="/zh/specs/">截图尺寸与导出规格专页</a>。</p>`,
+        `<p>为每个要导出的姿态准备一张截图。Duo Studio 将 iPhone Duo 内屏按横屏 2853 × 2007 像素、竖屏 2007 × 2853 像素(约 1.42:1)渲染,外屏为 1398 × 2034 像素,站立姿态为 2034 × 1398 像素。这些尺寸是本工具截图槽位的预设值，不代表经过验证的硬件参数或 App Store 提交要求。工具接受每边最长 4096 像素的 PNG、JPEG 和 WebP 图片;比例不一致时,「适应」保留完整图像并留边,「填充」裁剪铺满。</p>${sizeTable.zh}${image('poses', 'zh')}<p>完整的槽位、姿态与导出规格表见<a href="/zh/specs/">截图尺寸与导出规格专页</a>。</p>`,
       ],
       [
         '截图制作和网页模拟有什么区别?',
@@ -226,46 +246,93 @@ const specs = {
     ],
   },
 };
-function head(title, description, path, lang = 'en', schema = null, alt = null) {
-  return `<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${e(title)}</title><meta name="description" content="${e(description)}"><meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="${origin}${path}"><link rel="icon" href="/favicon.svg"><meta name="theme-color" content="#f6f7f9"><meta property="og:type" content="website"><meta property="og:site_name" content="Duo Studio"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(description)}"><meta property="og:url" content="${origin}${path}"><meta property="og:locale" content="${lang === 'zh' ? 'zh_CN' : 'en_US'}"><meta property="og:image" content="${origin}/social/duo-studio.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Duo Studio foldable phone mockup editor"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${e(title)}"><meta name="twitter:description" content="${e(description)}"><meta name="twitter:image" content="${origin}/social/duo-studio.png"><meta name="twitter:image:alt" content="Duo Studio foldable phone mockup editor">${alt ? `<link rel="alternate" hreflang="en" href="${origin}${alt.en}"><link rel="alternate" hreflang="zh-Hans" href="${origin}${alt.zh}"><link rel="alternate" hreflang="x-default" href="${origin}${alt.en}">` : ''}${schema ? `<script type="application/ld+json">${JSON.stringify(schema)}</script>` : ''}`;
+const { facts: extraFacts, specs: extraSpecs } = translatedArticles(repo, image);
+Object.assign(facts, extraFacts);
+Object.assign(specs, extraSpecs);
+const languages = Object.keys(locales);
+const editorAlt = Object.fromEntries(languages.map((lang) => [lang, locales[lang].path]));
+const guideAlt = Object.fromEntries(languages.map((lang) => [lang, facts[lang].path]));
+const specsAlt = Object.fromEntries(languages.map((lang) => [lang, specs[lang].path]));
+function alternateLinks(alt) {
+  return (
+    languages
+      .map(
+        (lang) =>
+          `<link rel="alternate" hreflang="${locales[lang].htmlLang}" href="${origin}${alt[lang]}">`,
+      )
+      .join('') + `<link rel="alternate" hreflang="x-default" href="${origin}${alt.en}">`
+  );
 }
-const footer = (lang) =>
-  `<footer><p>${dateHtml[lang]} · <a href="${repo}">${lang === 'zh' ? '源码与素材来源' : 'Source & attribution'}</a></p></footer>`;
-const app = {
-  '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  '@id': origin + '/#app',
-  name: 'Duo Studio',
-  alternateName: 'iPhoneDuoMock',
-  url: origin + '/',
-  applicationCategory: 'DesignApplication',
-  operatingSystem: 'Web browser',
-  isAccessibleForFree: true,
-  description: facts.en.intro,
-  license: repo + '/blob/main/LICENSE',
-  sameAs: [repo],
-  datePublished: published,
-  dateModified: updated,
-  featureList: [
-    'Inner and outer screen screenshot mockups',
-    'Six device poses',
-    'Embeddable website preview',
-    'PNG, MP4, WebM and GIF export',
-  ],
+function head(title, description, path, lang, schema, alt) {
+  return `<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${e(title)}</title><meta name="description" content="${e(description)}"><meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="${origin}${path}"><link rel="icon" href="/favicon.svg"><meta name="theme-color" content="#f6f7f9"><meta property="og:type" content="website"><meta property="og:site_name" content="Duo Studio"><meta property="og:title" content="${e(title)}"><meta property="og:description" content="${e(description)}"><meta property="og:url" content="${origin}${path}"><meta property="og:locale" content="${locales[lang].ogLocale}">${languages
+    .filter((code) => code !== lang)
+    .map((code) => `<meta property="og:locale:alternate" content="${locales[code].ogLocale}">`)
+    .join(
+      '',
+    )}<meta property="og:image" content="${origin}/social/duo-studio.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${e(title)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${e(title)}"><meta name="twitter:description" content="${e(description)}"><meta name="twitter:image" content="${origin}/social/duo-studio.png"><meta name="twitter:image:alt" content="${e(title)}">${alternateLinks(alt)}<script type="application/ld+json">${JSON.stringify(schema)}</script>`;
+}
+const sourceLabels = {
+  en: 'Source & attribution',
+  zh: '源码与素材来源',
+  ja: 'ソースコードと素材の出典',
+  fr: 'Code source et attribution',
 };
-writeFileSync(
-  'index.html',
-  `<!doctype html><html lang="en"><head>${head('Duo Studio — Foldable Phone Mockups & Animations', 'Create foldable phone mockups from your app screenshots. Preview embeddable websites and export PNG, MP4 or GIF locally in your browser.', '/', 'en', app)}</head><body><div id="root"><main style="max-width:760px;margin:64px auto;padding:24px;font:18px/1.6 system-ui"><h1>Duo Studio — foldable phone mockups</h1><p>${facts.en.intro} Duo Studio creates iPhone Duo-style visual mockups; it does not run iOS and is not an Apple product.</p><p><a href="/guide/">Read the guide</a> · <a href="/specs/">Screenshot sizes &amp; export specs</a> · <a href="/zh/guide/">中文指南</a> · <a href="/zh/specs/">中文规格页</a></p><noscript><p>Enable JavaScript to use the interactive editor. The guides work without JavaScript.</p></noscript></main></div><script type="module" src="/src/main.tsx"></script></body></html>`,
-);
-function writeArticle(set, alternates) {
-  const lang =
-    set === specs.en || set === specs.zh
-      ? set === specs.zh
-        ? 'zh'
-        : 'en'
-      : set === facts.zh
-        ? 'zh'
-        : 'en';
+const specLabels = {
+  en: 'Screenshot sizes & export specs',
+  zh: '截图尺寸与导出规格',
+  ja: '画面サイズと書き出し仕様',
+  fr: 'Dimensions et formats d’export',
+};
+const noScript = {
+  en: 'Enable JavaScript to use the interactive editor. The guides work without JavaScript.',
+  zh: '请启用 JavaScript 使用编辑器。指南无需 JavaScript 即可阅读。',
+  ja: 'エディターには JavaScript が必要です。ガイドは JavaScript なしで読めます。',
+  fr: 'Activez JavaScript pour utiliser l’éditeur. Les guides restent accessibles sans JavaScript.',
+};
+const disclaimer = {
+  en: 'Duo Studio is not an Apple product and does not run iOS.',
+  zh: 'Duo Studio 不是 Apple 官方产品，也不运行 iOS。',
+  ja: 'Duo Studio は Apple の製品ではなく、iOS を実行しません。',
+  fr: 'Duo Studio n’est pas un produit Apple et n’exécute pas iOS.',
+};
+const nav = (alt, current) =>
+  languages
+    .map(
+      (lang) =>
+        `<a href="${alt[lang]}" lang="${locales[lang].htmlLang}" hreflang="${locales[lang].htmlLang}"${current === lang ? ' aria-current="page"' : ''}>${locales[lang].label}</a>`,
+    )
+    .join('');
+const footer = (lang) =>
+  `<footer><p>${dateHtml[lang]} · <a href="${repo}">${sourceLabels[lang]}</a></p></footer>`;
+const generated = [];
+for (const lang of languages) {
+  const meta = locales[lang];
+  const app = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': origin + '/#app',
+    name: 'Duo Studio',
+    alternateName: 'iPhoneDuoMock',
+    url: origin + meta.path,
+    applicationCategory: 'DesignApplication',
+    operatingSystem: 'Web browser',
+    isAccessibleForFree: true,
+    description: meta.description,
+    inLanguage: meta.htmlLang,
+    license: repo + '/blob/main/LICENSE',
+    sameAs: [repo],
+    datePublished: published,
+    dateModified: updated,
+  };
+  const file = lang === 'en' ? 'index.html' : `${lang}/index.html`;
+  if (lang !== 'en') mkdirSync(lang, { recursive: true });
+  writeFileSync(
+    file,
+    `<!doctype html><html lang="${meta.htmlLang}"><head>${head(meta.title, meta.description, meta.path, lang, app, editorAlt)}</head><body><div id="root"><main style="max-width:760px;margin:64px auto;padding:24px;font:18px/1.6 system-ui"><h1>${facts[lang].heading}</h1><p>${facts[lang].intro}</p><p>${disclaimer[lang]}</p><p><a href="${facts[lang].path}">${meta.guide}</a> · <a href="${specs[lang].path}">${specLabels[lang]}</a></p><nav>${nav(editorAlt, lang)}</nav><noscript><p>${noScript[lang]}</p></noscript></main></div><script type="module" src="/src/main.tsx"></script></body></html>`,
+  );
+  generated.push(file);
+}
+function writeArticle(set, lang, alternates, isGuide) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -273,26 +340,24 @@ function writeArticle(set, alternates) {
     name: set.title,
     description: set.description,
     url: origin + set.path,
-    inLanguage: lang === 'zh' ? 'zh-Hans' : 'en',
+    inLanguage: locales[lang].htmlLang,
     datePublished: published,
     dateModified: updated,
     about: { '@id': origin + '/#app' },
   };
   const dir = 'public' + set.path;
   mkdirSync(dir, { recursive: true });
-  const heroImage = set === facts.en || set === facts.zh ? image('fold', lang, false) : '';
   writeFileSync(
     dir + 'index.html',
-    `<!doctype html><html lang="${lang === 'zh' ? 'zh-Hans' : 'en'}"><head>${head(set.title, set.description, set.path, lang, schema, alternates)}<link rel="stylesheet" href="/guide.css"></head><body><header><a href="/">Duo Studio</a><nav aria-label="${lang === 'zh' ? '导航' : 'Navigation'}"><a href="${set.otherPath}" lang="${lang === 'zh' ? 'en' : 'zh-Hans'}">${set.other}</a><a href="/" class="action">${set.open}</a></nav></header><main><h1>${set.heading}</h1><p class="lead">${set.intro}</p>${heroImage}${set.sections.map(([h, b], i) => `<section id="section-${i + 1}"><h2>${h}</h2>${b}</section>`).join('')}<p><a class="action" href="/">${set.open}</a></p></main>${footer(lang)}</body></html>`,
+    `<!doctype html><html lang="${locales[lang].htmlLang}"><head>${head(set.title, set.description, set.path, lang, schema, alternates)}<link rel="stylesheet" href="/guide.css"></head><body><header><a href="${locales[lang].path}">Duo Studio</a><nav>${nav(alternates, lang)}<a href="${locales[lang].path}" class="action">${set.open}</a></nav></header><main><h1>${set.heading}</h1><p class="lead">${set.intro}</p>${isGuide ? image('fold', lang, false) : ''}${set.sections.map(([h, b], i) => `<section id="section-${i + 1}"><h2>${h}</h2>${b}</section>`).join('')}<p><a href="${isGuide ? specs[lang].path : facts[lang].path}">${isGuide ? specLabels[lang] : locales[lang].guide}</a></p><p><a class="action" href="${locales[lang].path}">${set.open}</a></p></main>${footer(lang)}</body></html>`,
   );
+  generated.push(dir + 'index.html');
 }
-const guideAlt = { en: '/guide/', zh: '/zh/guide/' };
-const specsAlt = { en: '/specs/', zh: '/zh/specs/' };
-writeArticle(facts.en, guideAlt);
-writeArticle(facts.zh, guideAlt);
-writeArticle(specs.en, specsAlt);
-writeArticle(specs.zh, specsAlt);
-const paths = ['/', '/guide/', '/zh/guide/', '/specs/', '/zh/specs/'];
+for (const lang of languages) {
+  writeArticle(facts[lang], lang, guideAlt, true);
+  writeArticle(specs[lang], lang, specsAlt, false);
+}
+const paths = [...Object.values(editorAlt), ...Object.values(guideAlt), ...Object.values(specsAlt)];
 writeFileSync(
   'public/sitemap.xml',
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${paths.map((path) => `<url><loc>${origin}${path}</loc><lastmod>${updated}</lastmod></url>`).join('')}</urlset>\n`,
@@ -300,33 +365,25 @@ writeFileSync(
 writeFileSync('public/robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${origin}/sitemap.xml\n`);
 writeFileSync(
   'public/llms.txt',
-  `# Duo Studio\n> Open-source, browser-based tool for iPhone Duo-style foldable phone mockups and folding animations from app screenshots. All processing is local; nothing is uploaded.\n\n## Pages\n- [Screenshot sizes and export specs](https://iduo.clothpath.com/specs/): Exact inner/outer screen pixel dimensions, six poses, export formats, resolutions and frame rates\n- [English guide](https://iduo.clothpath.com/guide/): How to make foldable mockups, preview embeddable websites, and export PNG, MP4, WebM or GIF\n- [中文指南](https://iduo.clothpath.com/zh/guide/): 折叠屏效果图制作与网页模拟使用指南\n- [截图尺寸与导出规格](https://iduo.clothpath.com/zh/specs/): 内外屏像素尺寸、六种姿态与导出格式\n- [Editor](https://iduo.clothpath.com/): Interactive editor (requires JavaScript)\n\n## Key facts\n- Inner screen: 2853 × 2007 px landscape (1.42:1), 2007 × 2853 px portrait\n- Outer screen: 1398 × 2034 px portrait, 2034 × 1398 px standing pose\n- Exports: PNG (scene-native up to 2853 × 2007), MP4/WebM 30 fps, GIF 12 fps, ZIP bundles\n- Privacy: screenshots are processed locally and never uploaded\n- Independent open-source project, not affiliated with Apple\n`,
+  `# Duo Studio\n> Open-source browser tool for foldable phone mockups and animations. Uploaded screenshots are processed locally. Browser mode connects directly to the requested website and requires permission for tab capture when exporting.\n\n## Pages\n${languages.map((lang) => `- [${locales[lang].label}: ${locales[lang].guide}](${origin}${facts[lang].path}): ${facts[lang].description}\n- [${specLabels[lang]}](${origin}${specs[lang].path}): ${specs[lang].description}`).join('\n')}\n\n## Facts\n- Screenshot slot presets: inner 2853 × 2007 or 2007 × 2853; outer 1398 × 2034 or 2034 × 1398 pixels. These are tool presets, not hardware certification.\n- PNG stills, MP4/WebM at 30 fps, GIF at 12 fps and ZIP scene bundles. Video encoding depends on browser support.\n- Independent project; does not run iOS and is not affiliated with Apple.\n- [Source and attribution](${repo})\n`,
 );
-// IndexNow key file for Bing and other IndexNow partners.
 writeFileSync(`public/${indexNowKey}.txt`, indexNowKey);
 writeFileSync(
   'public/404.html',
-  '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Page not found | Duo Studio</title><link rel="stylesheet" href="/guide.css"></head><body><main><h1>Page not found</h1><p>This address does not exist.</p><p><a href="/">Open Duo Studio</a> · <a href="/guide/">Read the guide</a> · <a href="/specs/">Screenshot sizes</a></p></main></body></html>',
+  '<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Page not found | Duo Studio</title><link rel="stylesheet" href="/guide.css"></head><body><main><h1>Page not found</h1><p><a href="/">Open Duo Studio</a></p></main></body></html>',
 );
-
-// Allow only the generated JSON-LD blocks; preserve the existing script-src policy.
+// CSP hashes cover every generated static JSON-LD block.
 const { createHash } = await import('node:crypto');
-const { readFileSync } = await import('node:fs');
 const hashes = [
-  'index.html',
-  'public/guide/index.html',
-  'public/zh/guide/index.html',
-  'public/specs/index.html',
-  'public/zh/specs/index.html',
-].map((file) => {
-  const json = readFileSync(file, 'utf8').match(
-    /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
-  )[1];
-  return `'sha256-${createHash('sha256').update(json).digest('base64')}'`;
-});
+  ...new Set(
+    generated.map((file) => {
+      const json = readFileSync(file, 'utf8').match(
+        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+      )[1];
+      return `'sha256-${createHash('sha256').update(json).digest('base64')}'`;
+    }),
+  ),
+];
 let headers = readFileSync('public/_headers', 'utf8').replace(/ 'sha256-[^']+'/g, '');
 headers = headers.replace("script-src 'self';", `script-src 'self' ${hashes.join(' ')};`);
-if (!headers.includes('/browser-demo\n'))
-  headers +=
-    '\n/browser-demo\n  X-Robots-Tag: noindex\n/browser-demo.html\n  X-Robots-Tag: noindex\n';
 writeFileSync('public/_headers', headers);

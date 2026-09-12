@@ -6,8 +6,6 @@ Turn app screenshots and websites into foldable device mockups. Preview differen
 
 [![Duo Studio — upload, fold, export](docs/media/duo-studio-overview.gif)](docs/media/duo-studio-overview.mp4)
 
-[Watch the 8-second demo](docs/media/duo-studio-overview.mp4)
-
 ## How to use
 
 1. **Add content** — upload inner and outer screen screenshots, or switch to Browser mode and enter a website URL.

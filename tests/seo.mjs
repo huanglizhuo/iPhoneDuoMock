@@ -2,15 +2,17 @@ import assert from 'node:assert/strict';
 import { readFile, access, readdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 const root = 'https://iduo.clothpath.com';
-const updated = '2026-09-12';
+const updated = '2026-09-13';
+const langs = {
+  en: { html: 'en', prefix: '' },
+  zh: { html: 'zh-Hans', prefix: 'zh/' },
+  ja: { html: 'ja', prefix: 'ja/' },
+  fr: { html: 'fr', prefix: 'fr/' },
+};
 const headers = await readFile('dist/_headers', 'utf8');
-const pages = [
-  ['index.html', '/', 'en'],
-  ['guide/index.html', '/guide/', 'en'],
-  ['zh/guide/index.html', '/zh/guide/', 'zh-Hans'],
-  ['specs/index.html', '/specs/', 'en'],
-  ['zh/specs/index.html', '/zh/specs/', 'zh-Hans'],
-];
+const pages = Object.values(langs).flatMap(({ html, prefix }) =>
+  ['', 'guide/', 'specs/'].map((part) => [prefix + part + 'index.html', '/' + prefix + part, html]),
+);
 for (const [file, path, lang] of pages) {
   const html = await readFile('dist/' + file, 'utf8');
   assert.match(html, new RegExp(`<html lang="${lang}"`));
@@ -22,10 +24,17 @@ for (const [file, path, lang] of pages) {
   const data = JSON.parse(json);
   assert.equal(data.url, root + path);
   assert.equal(data.dateModified, updated);
-  assert.equal(data.datePublished, updated);
+  assert.equal(data.datePublished, '2026-09-12');
+  assert.equal(data.inLanguage, lang);
+  const group = path.includes('/guide/') ? 'guide/' : path.includes('/specs/') ? 'specs/' : '';
+  for (const alternate of Object.values(langs))
+    assert(
+      html.includes(`hreflang="${alternate.html}" href="${root}/${alternate.prefix}${group}"`),
+    );
+  assert(html.includes(`hreflang="x-default" href="${root}/${group}"`));
   assert(headers.includes(`'sha256-${createHash('sha256').update(json).digest('base64')}'`));
   assert.equal((html.match(/<h1[ >]/g) || []).length, 1);
-  if (path !== '/') {
+  if (path.includes('/guide/') || path.includes('/specs/')) {
     assert(!html.includes('type="module"'));
     assert(!html.includes('<script src='));
     assert(html.includes('hreflang="en"'));
@@ -56,7 +65,7 @@ for (const asset of [
 ]) {
   await access('dist/' + asset);
 }
-for (const specsFile of ['specs/index.html', 'zh/specs/index.html']) {
+for (const specsFile of Object.values(langs).map(({ prefix }) => prefix + 'specs/index.html')) {
   const html = await readFile('dist/' + specsFile, 'utf8');
   assert(html.includes('2853 × 2007'));
   assert(html.includes('2007 × 2853'));
@@ -66,8 +75,8 @@ for (const specsFile of ['specs/index.html', 'zh/specs/index.html']) {
   assert(html.includes('GIF'));
 }
 const sitemap = await readFile('dist/sitemap.xml', 'utf8');
-assert.equal((sitemap.match(/<loc>/g) || []).length, 5);
-assert.equal((sitemap.match(/<lastmod>/g) || []).length, 5);
+assert.equal((sitemap.match(/<loc>/g) || []).length, 12);
+assert.equal((sitemap.match(/<lastmod>/g) || []).length, 12);
 assert(sitemap.includes(`<lastmod>${updated}</lastmod>`));
 assert((await readFile('dist/robots.txt', 'utf8')).includes(`Sitemap: ${root}/sitemap.xml`));
 const llms = await readFile('dist/llms.txt', 'utf8');
@@ -82,5 +91,5 @@ const png = await readFile('dist/social/duo-studio.png');
 assert.equal(png.readUInt32BE(16), 1200);
 assert.equal(png.readUInt32BE(20), 630);
 console.log(
-  'SEO checks passed: 5 canonical pages with dates, specs data pages, crawlable guides with captured assets, JSON-LD/CSP, llms.txt, IndexNow key, sharing image, sitemap lastmod and 404 configuration.',
+  'SEO checks passed: 12 canonical pages with dates, specs data pages, crawlable guides with captured assets, JSON-LD/CSP, llms.txt, IndexNow key, sharing image, sitemap lastmod and 404 configuration.',
 );

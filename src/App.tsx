@@ -56,8 +56,8 @@ import { Modal } from './components/Modal';
 import { animationSize, exportProject, videoCapabilities } from './lib/export';
 import type { ExportKind } from './lib/export';
 import { captureBrowserProject } from './lib/browserCapture';
-import { t, useI18n } from './i18n';
-import type { DictionaryKey } from './i18n';
+import { t, useI18n, locales, languages } from './i18n';
+import type { DictionaryKey, Lang } from './i18n';
 
 const REPO_URL = 'https://github.com/huanglizhuo/iPhoneDuoMock';
 const THEME_KEY = 'duo-studio-theme';
@@ -770,9 +770,9 @@ export default function App() {
           <span className="top-separator" />
           <a
             className="icon-button"
-            href={lang === 'zh' ? '/zh/guide/' : '/guide/'}
-            aria-label={lang === 'zh' ? '使用指南' : 'User guide'}
-            title={lang === 'zh' ? '使用指南' : 'User guide'}
+            href={`${locales[lang].path}guide/`}
+            aria-label={locales[lang].guide}
+            title={locales[lang].guide}
           >
             <Info size={17} />
           </a>
@@ -794,22 +794,18 @@ export default function App() {
           >
             {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
           </button>
-          <div className="lang-switch" role="group" aria-label={t('aria.langSwitch')}>
-            <button
-              aria-pressed={lang === 'en'}
-              className={lang === 'en' ? 'active' : ''}
-              onClick={() => setLang('en')}
-            >
-              EN
-            </button>
-            <button
-              aria-pressed={lang === 'zh'}
-              className={lang === 'zh' ? 'active' : ''}
-              onClick={() => setLang('zh')}
-            >
-              中文
-            </button>
-          </div>
+          <select
+            className="lang-switch"
+            aria-label={t('aria.langSwitch')}
+            value={lang}
+            onChange={(event) => setLang(event.target.value as Lang)}
+          >
+            {languages.map((code) => (
+              <option key={code} value={code} lang={locales[code].htmlLang}>
+                {locales[code].label}
+              </option>
+            ))}
+          </select>
         </div>
         <input
           hidden

@@ -131,3 +131,7 @@ footer p {
     font-size: 15px;
   }
 }
+
+header { flex-wrap: wrap; }
+nav { flex-wrap: wrap; gap: 12px 18px; }
+nav a[aria-current="page"] { color: inherit; font-weight: 650; }

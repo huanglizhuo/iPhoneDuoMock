@@ -1,16 +1,18 @@
 # Duo Studio
-> Open-source, browser-based tool for iPhone Duo-style foldable phone mockups and folding animations from app screenshots. All processing is local; nothing is uploaded.
+> Open-source browser tool for foldable phone mockups and animations. Uploaded screenshots are processed locally. Browser mode connects directly to the requested website and requires permission for tab capture when exporting.
 
 ## Pages
-- [Screenshot sizes and export specs](https://iduo.clothpath.com/specs/): Exact inner/outer screen pixel dimensions, six poses, export formats, resolutions and frame rates
-- [English guide](https://iduo.clothpath.com/guide/): How to make foldable mockups, preview embeddable websites, and export PNG, MP4, WebM or GIF
-- [中文指南](https://iduo.clothpath.com/zh/guide/): 折叠屏效果图制作与网页模拟使用指南
-- [截图尺寸与导出规格](https://iduo.clothpath.com/zh/specs/): 内外屏像素尺寸、六种姿态与导出格式
-- [Editor](https://iduo.clothpath.com/): Interactive editor (requires JavaScript)
+- [English: User guide](https://iduo.clothpath.com/guide/): Learn how to create foldable phone mockups from inner and outer screenshots, preview embeddable websites, and export PNG, MP4, WebM or GIF with Duo Studio.
+- [Screenshot sizes & export specs](https://iduo.clothpath.com/specs/): Exact pixel dimensions for iPhone Duo inner and outer screens, all six poses, export formats, resolutions, frame rates and input limits — measured from Duo Studio.
+- [简体中文: 使用指南](https://iduo.clothpath.com/zh/guide/): 用 Duo Studio 上传内外屏截图、切换折叠场景、预览支持嵌入的网站,并在本地导出 PNG、MP4、WebM 或 GIF。
+- [截图尺寸与导出规格](https://iduo.clothpath.com/zh/specs/): iPhone Duo 内外屏精确像素尺寸、六种设备姿态、导出格式、分辨率、帧率与输入限制 —— 全部从 Duo Studio 实测得出。
+- [日本語: 使い方](https://iduo.clothpath.com/ja/guide/): 内外画面のスクリーンショットからモックアップを作成し、Web サイトをプレビュー。PNG・MP4・WebM・GIF をローカルで書き出す手順を紹介します。
+- [画面サイズと書き出し仕様](https://iduo.clothpath.com/ja/specs/): Duo Studio の内外画面の推奨画像サイズ、6 つの姿勢、書き出し形式、解像度とフレームレート。
+- [Français: Guide d’utilisation](https://iduo.clothpath.com/fr/guide/): Importez vos captures internes et externes, prévisualisez un site intégrable et exportez des images PNG ou des animations MP4, WebM et GIF en local.
+- [Dimensions et formats d’export](https://iduo.clothpath.com/fr/specs/): Dimensions recommandées des écrans Duo Studio, six positions, formats d’export, résolutions et fréquences d’images.
 
-## Key facts
-- Inner screen: 2853 × 2007 px landscape (1.42:1), 2007 × 2853 px portrait
-- Outer screen: 1398 × 2034 px portrait, 2034 × 1398 px standing pose
-- Exports: PNG (scene-native up to 2853 × 2007), MP4/WebM 30 fps, GIF 12 fps, ZIP bundles
-- Privacy: screenshots are processed locally and never uploaded
-- Independent open-source project, not affiliated with Apple
+## Facts
+- Screenshot slot presets: inner 2853 × 2007 or 2007 × 2853; outer 1398 × 2034 or 2034 × 1398 pixels. These are tool presets, not hardware certification.
+- PNG stills, MP4/WebM at 30 fps, GIF at 12 fps and ZIP scene bundles. Video encoding depends on browser support.
+- Independent project; does not run iOS and is not affiliated with Apple.
+- [Source and attribution](https://github.com/huanglizhuo/iPhoneDuoMock)
