@@ -62,3 +62,11 @@
 Chrome MCP 再次核对官网的 framing、lookupUv 和取样逻辑：官网有 `/ 1.12` 的取景扩展，且边缘衰减范围延伸到 UV 范围以外，并非本地旧代码的 0–1 四边矩形清零。本地此次将横向覆盖固定为 1，纹理保持 clamp-to-edge；仅纵向范围参与黑区遮罩和边缘模糊。只更改这一变量，原失败测试即通过，确认根因是横向遮罩，而非缺失图片、物理边框或暗化公式。
 
 回归覆盖内屏 90/95/98/100% 和外屏 0/2/5/10% 的亮边；已有固定右屏、上下黑区、局部模糊、图像替换和关闭恢复测试继续通过。效果图：`docs/screenshots/vertical-edge-fixed-{5,33,65,95}.png`。此修复对应用户指出的边缘行为，不将本地重写着色器描述为完整 Lotus 引擎的逐像素复制。
+
+### Internal bezel caps (2026-09-12)
+
+The two inner bezel meshes (`jPmlOthRZKgKKHD`, `dSFhWkOicQjmvnq`) contain closing faces along the hinge. In free-fold framing these intersect the continuous screen, producing two vertical black lines even with a solid white texture. This is geometry occlusion, not screenshot content or video encoding.
+
+`src/lib/device-geometry.ts` removes four internal triangles per half at model load, selected by their model-local hinge bounds and full-height span. The visible rim, corners, top/bottom edges, materials and depth testing are retained. The same corrected geometry feeds screenshot rendering, browser visibility masks and exports. If the model is replaced, recheck these bounds and the exported-image regression in `tests/hinge-seam.spec.ts`.
+
+Validation: the white PNG export regression fails on the original model (darkest central column 223/255) and passes after correction. Projection, vertical edges, browser masks across six poses, playback scene retention and browser output orientation tests pass. Real EchoPod PNGs for all six poses and five fold progress values, plus a 4-second MP4 and GIF, were exported and visually inspected before rebuilding the README animation.

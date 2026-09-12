@@ -8,6 +8,7 @@ import { screenSurface } from './browser';
 import { ScreenVisibility } from './screen-visibility';
 import { t } from '../i18n';
 import { ProjectedScreen } from './projected-screen';
+import { removeInternalBezelCaps } from './device-geometry';
 const MODEL = '/models/apple-duo/';
 function artwork(c: HTMLCanvasElement, rotate: number) {
   if (!rotate) return c;
@@ -88,6 +89,7 @@ export class DeviceRenderer {
     this.model.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
       o.frustumCulled = false;
+      removeInternalBezelCaps(o.name, o.geometry);
       const m = o.material as THREE.MeshPhysicalMaterial;
       if (materials.has(m)) return;
       materials.add(m);

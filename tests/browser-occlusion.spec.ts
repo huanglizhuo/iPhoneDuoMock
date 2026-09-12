@@ -66,7 +66,8 @@ test('browser masks hide web content behind the physical frame in every pose', a
 });
 test('both workspaces keep the selected pose when playback starts', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Saved to this browser')).toBeVisible();
+  // Basic mode hides the save label; its text still signals completed loading.
+  await expect(page.getByText('Saved to this browser')).toBeAttached();
   for (const workspace of ['Screenshots', 'Browser sim']) {
     await page.getByRole('button', { name: workspace, exact: true }).click();
     for (const [name, id] of [
