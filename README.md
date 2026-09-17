@@ -2,6 +2,8 @@
 
 [English](README.md) · [简体中文](README.zh-CN.md) · **[Try it online ↗](https://iduo.clothpath.com/)**
 
+[![OctoCounts](https://api.octocounts.com/badge/huanglizhuo/iPhoneDuoMock)](https://octocounts.com/github/huanglizhuo/iPhoneDuoMock)
+
 Turn app screenshots and websites into foldable device mockups. Preview different poses and export images or animations, all in your browser.
 
 [![Duo Studio — upload, fold, export](docs/media/duo-studio-overview.gif)](docs/media/duo-studio-overview.mp4)
@@ -32,3 +34,7 @@ For **Cloudflare Pages**, use build command `npm run build` and output directory
 Inspired by [iphone-duo](https://github.com/chuspeeism/iphone-duo) and [DuoLikeAnimation](https://github.com/elijah-semyonov/DuoLikeAnimation). Built with Codex Astra.
 
 Code: [MIT](LICENSE). Device assets originate from Apple and belong to their respective owners; see [asset provenance](docs/APPLE_VIEWER.md). Mockups demonstrate appearance and do not verify actual app compatibility.
+
+### Webpage screenshot fallback
+
+For sites that cannot be embedded, the local app can check embedding headers and generate five static screen images. Run `npx playwright install chromium`, then `npm run dev` (or `npm run preview` after building). Submit a URL in Browser sim and select **Create webpage screenshots**. The new screenshot page preserves the source URL and supports refreshing, undo, project saving and the existing exports. It uses a fresh browser session, so login or verification may still be needed on the original site. Static Cloudflare Pages deployments do not include this local service. See [browser mode details](docs/BROWSER_MODE.md).
